@@ -1,51 +1,103 @@
-var ipfs_api = require('ipfs-api');
-var ipfs = ipfs_api('localhost', 5001);
+'use strict';
 
-var metadata = {
-  title: "song 2",
-  artist: "blur",
+var http = require('http');
+var FormData = require('form-data');
+
+// function getObject(key, cb) {
+//     ipfs.object.get(key, function (error, response) {
+//         console.log("object/get", error, response);
+//         if (error) {
+//             process.exit(1);
+//         }
+//         cb(response);
+//     });
+// }
+
+function DagNode(links, data) {
+  this.links = links;
+  if (!links) {
+    this.links = [];
+  }
+  this.data = data;
+  if (!data) {
+    this.data = '';
+  }
+}
+DagNode.prototype.asJSONforAPI = function() {
+    var data_enc = new Buffer(this.data).toString('base64'),
+        dag_object = {
+            Links: this.links,
+            Data: data_enc,
+        };
+
+    return new Buffer(JSON.stringify(dag_object));
 };
 
-function addMetadataObject(obj, cb){
-  var dag_object = {
-    Links: [],
-    Data: new Buffer(JSON.stringify(obj)).toString('base64'),
-    Data: "\b\u0001",
-  };
-
-  var dag_object_buf = new Buffer(JSON.stringify(dag_object));
-  console.log(dag_object_buf.toString('ascii'))
-
-  ipfs.object.put(dag_object_buf, 'json', function(error, response){
-    console.log("object/put", error, response);
-    if (error) { process.exit(1) }
-    cb(response.Key);
-  });
+function dagLeaf(data) {
+  return new DagNode(null, data);
 }
 
-addMetadataObject(metadata, function(key){
-  getObject(key);
-  // console.log(object);
-});
+// function getCurrentPublishedName(cb) {
+//
+//     ipfs.name.resolve(null, function (error, response) {
+//         console.log("name/resolve", error, response);
+//         if (error) {
+//             process.exit(1);
+//         }
+//         cb(response.Key);
+//     });
+// }
 
-function getCurrentPublishedName(cb) {
-  ipfs.name.resolve(null, function(error, response){
-    console.log("name/resolve", error, response)
-    if (error) { process.exit(1) }
-    cb(response.Key)
-  });
-}
+// addMetadataObject(1, function (key) {
+//     getObject(key, function (obj) {
+//         console.log(obj);
+//     });
+// });
 
-function getObject(key) {
-  ipfs.object.get(key, function(error, response){
-    console.log("object/get", error, response);
-    if (error) { process.exit(1); }
-    // cb(response)
-  });
-}
+// getCurrentPublishedName(function (key) {
+//     getObject(key, function (obj) {
+//         console.log(obj);
+//     });
+// });
 
-getCurrentPublishedName(function(key){
-  getObject(key);
-});
+exports.DagNode = DagNode;
 
-getObject("QmV9E5oNhFDWeRV8NQ91G7vp3pvff2S4UYkn89T5koSzqo");
+exports.addObject = function (dagNode, cb) {
+    var formdata = new FormData();
+    formdata.append('data', dagNode.asJSONforAPI(), {
+        filename: '_',
+        contentType: 'application/json'
+    });
+
+    var req = http.request({
+        hostname: 'localhost',
+        port: 5001,
+        path: '/api/v0/object/put?arg=json',
+        method: 'POST',
+        headers: formdata.getHeaders()
+    });
+    req.on('response', function (res) {
+        var responseBody = '';
+        res.setEncoding('utf8');
+
+        res.on('data', function (chunk) {
+            responseBody += chunk;
+        });
+
+        res.on('end', function () {
+            var obj = JSON.parse(responseBody);
+            if (res.statusCode !== 200) {
+                cb(obj, null);
+            } else {
+                cb(null, obj);
+            }
+        });
+    });
+
+    req.on('error', function (e) {
+        cb(e, null);
+    });
+
+    formdata.pipe(req);
+    req.end();
+};
