@@ -1,10 +1,10 @@
 {
-  "name": "allthemusic",
+  "name": "atm-ipfs-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vows --spec test/*"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +12,16 @@
     "form-data": "0.2.0"
   },
   "devDependencies": {
-    "vows": "0.8.1"
+    "vows": "0.8.1",
+    "jshint": "*",
+    "jscs": "*"
+  },
+  "jshintConfig": {
+    "unused": true,
+    "node": true,
+    "asi": true,
+    "freeze": true,
+    "forin": true,
+    "curly": true
   }
 }

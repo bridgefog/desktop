@@ -1,103 +1,137 @@
-'use strict';
+'use strict'
 
-var http = require('http');
-var FormData = require('form-data');
-
-// function getObject(key, cb) {
-//     ipfs.object.get(key, function (error, response) {
-//         console.log("object/get", error, response);
-//         if (error) {
-//             process.exit(1);
-//         }
-//         cb(response);
-//     });
-// }
+var http = require('http')
+var FormData = require('form-data')
 
 function DagNode(links, data) {
-  this.links = links;
+  this.links = links
   if (!links) {
-    this.links = [];
+    this.links = []
   }
-  this.data = data;
+  this.data = data
   if (!data) {
-    this.data = '';
+    this.data = ''
   }
 }
-DagNode.prototype.asJSONforAPI = function() {
-    var data_enc = new Buffer(this.data).toString('base64'),
-        dag_object = {
-            Links: this.links,
-            Data: data_enc,
-        };
 
-    return new Buffer(JSON.stringify(dag_object));
-};
+DagNode.prototype.asJSONforAPI = function () {
+  var data_enc = new Buffer(this.data).toString('base64')
+  var dag_object = {
+    Links: this.links,
+    Data: data_enc,
+  }
 
-function dagLeaf(data) {
-  return new DagNode(null, data);
+  return new Buffer(JSON.stringify(dag_object))
 }
 
-// function getCurrentPublishedName(cb) {
-//
-//     ipfs.name.resolve(null, function (error, response) {
-//         console.log("name/resolve", error, response);
-//         if (error) {
-//             process.exit(1);
-//         }
-//         cb(response.Key);
-//     });
-// }
+var nameResolve = function (_peerId, cb) {
+  var request = http.request({
+    hostname: 'localhost',
+    port: 5001,
+    path: '/api/v0/name/resolve',
+    method: 'GET'
+  })
 
-// addMetadataObject(1, function (key) {
-//     getObject(key, function (obj) {
-//         console.log(obj);
-//     });
-// });
+  request.on('response', function (response) {
+    var responseBody = ''
+    response.setEncoding('utf8')
 
-// getCurrentPublishedName(function (key) {
-//     getObject(key, function (obj) {
-//         console.log(obj);
-//     });
-// });
+    response.on('data', function (chunk) {
+      responseBody += chunk
+    })
 
-exports.DagNode = DagNode;
+    response.on('end', function () {
+      var obj = JSON.parse(responseBody)
+      if (response.statusCode === 200) {
+        cb(null, obj.Key)
+      } else {
+        cb(obj, null)
+      }
+    })
+  })
+
+  request.on('error', function (e) {
+    cb(e, null)
+  })
+
+  request.end()
+}
+
+exports.DagNode = DagNode
+exports.nameResolveSelf = function (cb) {
+  nameResolve(null, cb)
+}
+
+exports.namePublish = function (value, cb) {
+  var request = http.request({
+    hostname: 'localhost',
+    port: 5001,
+    path: '/api/v0/name/publish?arg=' + value,
+    method: 'GET'
+  })
+
+  request.on('response', function (response) {
+    var responseBody = ''
+    response.setEncoding('utf8')
+
+    response.on('data', function (chunk) {
+      responseBody += chunk
+    })
+
+    response.on('end', function () {
+      var obj = JSON.parse(responseBody)
+      if (response.statusCode === 200) {
+        cb(null)
+      } else {
+        cb(obj)
+      }
+    })
+  })
+
+  request.on('error', function (e) {
+    cb(e, null)
+  })
+
+  request.end()
+}
 
 exports.addObject = function (dagNode, cb) {
-    var formdata = new FormData();
-    formdata.append('data', dagNode.asJSONforAPI(), {
-        filename: '_',
-        contentType: 'application/json'
-    });
+  var form = new FormData()
+  form.append('data', dagNode.asJSONforAPI(), {
+    filename: '_',
+    contentType: 'application/json'
+  })
 
-    var req = http.request({
-        hostname: 'localhost',
-        port: 5001,
-        path: '/api/v0/object/put?arg=json',
-        method: 'POST',
-        headers: formdata.getHeaders()
-    });
-    req.on('response', function (res) {
-        var responseBody = '';
-        res.setEncoding('utf8');
+  var request = http.request({
+    hostname: 'localhost',
+    port: 5001,
+    path: '/api/v0/object/put?arg=json',
+    method: 'POST',
+    headers: form.getHeaders()
+  })
+  request.on('response', function (res) {
+    var responseBody = ''
+    res.setEncoding('utf8')
 
-        res.on('data', function (chunk) {
-            responseBody += chunk;
-        });
+    res.on('data', function (chunk) {
+      responseBody += chunk
+    })
 
-        res.on('end', function () {
-            var obj = JSON.parse(responseBody);
-            if (res.statusCode !== 200) {
-                cb(obj, null);
-            } else {
-                cb(null, obj);
-            }
-        });
-    });
+    res.on('end', function () {
+      var obj = JSON.parse(responseBody)
+      if (res.statusCode !== 200) {
+        cb(obj, null)
+      } else {
+        cb(null, obj)
+      }
+    })
+  })
 
-    req.on('error', function (e) {
-        cb(e, null);
-    });
+  request.on('error', function (e) {
+    cb(e, null)
+  })
 
-    formdata.pipe(req);
-    req.end();
-};
+  form.pipe(request)
+
+  request.end()
+}
