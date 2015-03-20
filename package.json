@@ -1,10 +1,10 @@
 {
-  "name": "atm-ipfs-api",
+  "name": "atm-common",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vows --spec test/*"
+    "test": "vows --spec test/**/*.js"
   },
   "author": "",
   "license": "ISC",

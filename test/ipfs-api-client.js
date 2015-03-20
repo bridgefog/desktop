@@ -2,7 +2,7 @@
 
 var assert = require('assert')
 var vows = require('vows')
-var ipfs = require('../')
+var ipfs = require('../lib/ipfs-api-client')('localhost', 9999)
 
 var knownHashes = {
   foo: 'QmWqEeZS1HELySbm8t8U55UkBe75kaLj9WnFb882Tkf5NL'
@@ -48,6 +48,7 @@ vows.describe('IPFS API').addBatch({
         })
       }
     },
+
     'with just links': {
       topic: function () {
         return new ipfs.DagNode([1, 2, 3], null)
@@ -59,6 +60,7 @@ vows.describe('IPFS API').addBatch({
         })
       }
     },
+
     'with just data': {
       topic: function () {
         return new ipfs.DagNode(null, 'foobarbaz')
@@ -70,6 +72,7 @@ vows.describe('IPFS API').addBatch({
         })
       }
     },
+
     asJSONforAPI: (function () {
       var data = 'foobarbaz'
       return {
