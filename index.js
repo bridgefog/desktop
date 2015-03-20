@@ -2,6 +2,7 @@
 
 var http = require('http')
 var FormData = require('form-data')
+var port = 5001
 
 function DagNode(links, data) {
   this.links = links
@@ -27,7 +28,7 @@ DagNode.prototype.asJSONforAPI = function () {
 var nameResolve = function (_peerId, cb) {
   var request = http.request({
     hostname: 'localhost',
-    port: 5001,
+    port: port,
     path: '/api/v0/name/resolve',
     method: 'GET'
   })
@@ -65,7 +66,7 @@ exports.nameResolveSelf = function (cb) {
 exports.namePublish = function (value, cb) {
   var request = http.request({
     hostname: 'localhost',
-    port: 5001,
+    port: port,
     path: '/api/v0/name/publish?arg=' + value,
     method: 'GET'
   })
@@ -104,7 +105,7 @@ exports.addObject = function (dagNode, cb) {
 
   var request = http.request({
     hostname: 'localhost',
-    port: 5001,
+    port: port,
     path: '/api/v0/object/put?arg=json',
     method: 'POST',
     headers: form.getHeaders()
