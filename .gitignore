@@ -1,1 +1,5 @@
 node_modules/
+
+/__files
+/mappings
+/wiremock-*
