@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd test/wiremock_scope
+
+wiremock_jar='wiremock-1.54-standalone.jar'
+if [ ! -f "$wiremock_jar" ]; then
+  curl "http://repo1.maven.org/maven2/com/github/tomakehurst/wiremock/1.54/${wiremock_jar}" > "${wiremock_jar}"
+fi
+
+java -jar wiremock-1.54-standalone.jar $@
