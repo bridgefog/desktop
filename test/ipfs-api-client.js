@@ -2,6 +2,7 @@
 
 var assert = require('assert')
 var vows = require('vows')
+var immutable = require('immutable')
 var ipfs = require('../lib/ipfs-api-client')('localhost', 9999)
 
 var knownHashes = {
@@ -11,7 +12,7 @@ var knownHashes = {
 vows.describe('IPFS API').addBatch({
   addObject: {
     topic: function () {
-      var dagNode = new ipfs.DagNode(null, 'foo')
+      var dagNode = new ipfs.DagNode({data: 'foo'})
       ipfs.addObject(dagNode, this.callback)
     },
     'returns a thing with the correct Hash': function (result) {
@@ -37,39 +38,53 @@ vows.describe('IPFS API').addBatch({
   },
 
   DagNode: {
-    'with no arguments': {
+    constructor: {
+      'with no arguments': {
+        topic: function () {
+          return new ipfs.DagNode()
+        },
+        'it is empty': function (node) {
+          assert.equal(node.data, null)
+          assert.equal(node.links.size, 0)
+        }
+      },
+
+      'with just links': {
+        topic: function () {
+          return new ipfs.DagNode({links: immutable.Set([1, 2, 3])})
+        },
+        'it has links but no data': function (node) {
+          assert.equal(node.data, null)
+          assert.equal(node.links.size, 3)
+          assert.deepEqual(node.links.toJS(), [1, 2, 3])
+        }
+      },
+
+      'with just data': {
+        topic: function () {
+          return new ipfs.DagNode({data: 'foobarbaz'})
+        },
+        'it has data but no links': function (node) {
+          assert.equal(node.data, 'foobarbaz')
+        }
+      },
+    },
+
+    addLink: {
       topic: function () {
         return new ipfs.DagNode()
       },
-      'it is empty': function (node) {
-        assert.deepEqual(node, {
-          links: [],
-          data: ''
-        })
-      }
-    },
-
-    'with just links': {
-      topic: function () {
-        return new ipfs.DagNode([1, 2, 3], null)
+      'it returns the node, for chaining': function (node) {
+        assert.instanceOf(node.addLink('fakelink1', 'fakehash1'), ipfs.DagNode)
       },
-      'it has links but no data': function (node) {
-        assert.deepEqual(node, {
-          links: [1, 2, 3],
-          data: ''
-        })
-      }
-    },
-
-    'with just data': {
-      topic: function () {
-        return new ipfs.DagNode(null, 'foobarbaz')
-      },
-      'it has data but no links': function (node) {
-        assert.deepEqual(node, {
-          links: [],
-          data: 'foobarbaz'
-        })
+      'it adds a link to the object with the given name and hash': function (node) {
+        assert.equal(node.links.size, 0)
+        node = node.addLink('name2', 'hash2')
+        assert.equal(node.links.size, 1)
+        assert.deepEqual(node.links.toJS(), [{
+          name: 'name2',
+          hash: 'hash2'
+        }])
       }
     },
 
@@ -77,7 +92,7 @@ vows.describe('IPFS API').addBatch({
       var data = 'foobarbaz'
       return {
         topic: function () {
-          return new ipfs.DagNode(null, data).asJSONforAPI()
+          return new ipfs.DagNode({data: data}).asJSONforAPI()
         },
         'returns buffer': function (buffer) {
           assert(buffer instanceof Buffer)

@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "form-data": "0.2.0"
+    "form-data": "0.2.0",
+    "immutable": "^3.6.4"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.11.0",

@@ -23,38 +23,72 @@ function inventSomeSongs() {
 }
 
 function addSongMetadataNode(metadata) {
-  var obj = new ipfs.DagNode([], JSON.stringify(metadata))
+  var obj = new ipfs.DagNode({
+    data: JSON.stringify(metadata)
+  })
   debuglog(obj.asJSONforAPI().toString('utf-8'))
+  return addObjectToIPFS(obj)
+}
+
+function addObjectToIPFS(object) {
   return new Promise(function (resolve, reject) {
-    ipfs.addObject(obj, function (error, key) {
+    ipfs.addObject(object, function (error, response) {
       if (error) {
         reject(error)
       } else {
-        resolve(key)
+        debuglog('addObjectToIPFS()', object, response)
+        resolve(response.Hash)
       }
     })
   })
 }
 
-// ipfs.nameResolveSelf(function (error, key) {
-//   debuglog(error, key)
-// });
-
-(function () {
-  // Wear badge
-  // Add some songs to ipfs
-  var songs = inventSomeSongs()
+function addSomeSongs(songs) {
   var addRequests = []
   for (i = 0; i < songs.length; i++) {
     addRequests[i] = addSongMetadataNode(songs[i])
   }
-  Promise.all(addRequests).then(
-      function (values) {
-        debuglog(values)
-      },
-      function (reason) {
-        debuglog('FAILED', reason)
+  return Promise.all(addRequests)
+}
+
+function addDirectoryTree(contentsKeys) {
+  var contentsNode = new ipfs.DagNode()
+  for (i = 0; i < contentsKeys.length; i++) {
+    contentsNode = contentsNode.addLink('', contentsKeys[i])
+    debuglog('contentsNode = ', contentsNode)
+  }
+  return addObjectToIPFS(contentsNode).then(function (contentsNodeHash) {
+    var atmNode = new ipfs.DagNode().addLink('contents', contentsNodeHash)
+    return addObjectToIPFS(atmNode)
+  }).then(function (atmNodeHash) {
+    var directoryNode = new ipfs.DagNode().addLink('allthemusic', atmNodeHash)
+    return addObjectToIPFS(directoryNode)
+  })
+}
+
+(function () {
+  // Wear badge
+  // Add some songs to ipfs
+  addSomeSongs(inventSomeSongs()).then(function (objects) {
+    debuglog(objects)
+    return addDirectoryTree(objects)
+  }).then(function (directoryNodeHash) {
+    return new Promise(function (resolve, reject) {
+      ipfs.namePublish(directoryNodeHash, function (error) {
+        if (error) {
+          reject(error)
+        } else {
+          resolve()
+        }
       })
-    // Add those keys to 'contents'
-    // re-publish directory
+    })
+  }).catch(function (reason) {
+    debuglog('FAILED', reason)
+    if (reason instanceof Error) {
+      debuglog(reason.stack)
+    }
+  })
+
+  // Add those keys to 'contents'
+  // re-publish directory
 })()
