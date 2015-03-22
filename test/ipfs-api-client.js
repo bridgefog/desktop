@@ -3,7 +3,7 @@
 var url = require('url')
 var assert = require('assert')
 
-var ipfs_endpoint = url.parse('http://localhost:9999/api/v0')
+var ipfs_endpoint = url.parse(process.env.ipfs_endpoint || process.env.npm_package_config_ipfs_endpoint)
 var ipfs = require('../lib/ipfs-api-client')(ipfs_endpoint)
 var DagObject = require('../lib/dag-object')
 
