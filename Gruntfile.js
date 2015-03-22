@@ -21,7 +21,7 @@ module.exports = function (grunt) {
     },
     shell: {
       test: {
-        command: 'npm run test -- --colors'
+        command: 'npm test -- --colors'
       }
     },
     jsbeautifier: {
