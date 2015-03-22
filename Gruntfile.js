@@ -16,7 +16,7 @@ module.exports = function (grunt) {
       },
     },
     watch: {
-      files: allSourceFiles,
+      files: allSourceFiles.concat(['package.json']),
       tasks: ['shell:test', 'jshint', 'jscs'],
     },
     shell: {
