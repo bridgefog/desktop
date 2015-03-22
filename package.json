@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vows --spec test/**/*.js"
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
@@ -20,12 +20,12 @@
     "grunt-shell": "^1.1.2",
     "jscs": "*",
     "jshint": "*",
-    "nock": "^1.2.0",
-    "vows": "0.8.1"
+    "mocha": "^2.2.1"
   },
   "jshintConfig": {
     "unused": true,
     "node": true,
+    "mocha": true,
     "asi": true,
     "freeze": true,
     "forin": true,
