@@ -1,6 +1,7 @@
 var util = require('util')
 var debuglog = util.debuglog('alice');
-var ipfs = require('../lib/ipfs-api-client')('localhost', 5001)
+var url = require('url')
+var ipfs = require('../lib/ipfs-api-client')(url.parse('http://localhost:5001/api/v0'))
 
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
@@ -67,8 +68,7 @@ function addDirectoryTree(contentsKeys) {
 }
 
 (function () {
-  // Wear badge
-  // Add some songs to ipfs
+  // TODO: Wear badge
   addSomeSongs(inventSomeSongs()).then(function (objects) {
     debuglog(objects)
     return addDirectoryTree(objects)
@@ -88,7 +88,4 @@ function addDirectoryTree(contentsKeys) {
       debuglog(reason.stack)
     }
   })
-
-  // Add those keys to 'contents'
-  // re-publish directory
 })()

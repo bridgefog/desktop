@@ -20,6 +20,7 @@
     "grunt-shell": "^1.1.2",
     "jscs": "*",
     "jshint": "*",
+    "nock": "^1.2.0",
     "vows": "0.8.1"
   },
   "jshintConfig": {
