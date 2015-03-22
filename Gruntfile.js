@@ -5,7 +5,9 @@ module.exports = function (grunt) {
     pkg: packageJSON,
     jshint: {
       files: allSourceFiles,
-      options: packageJSON.jshintConfig,
+      options: {
+        jshintrc: true,
+      }
     },
     jscs: {
       files: allSourceFiles,

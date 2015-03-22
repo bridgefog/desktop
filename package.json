@@ -21,14 +21,5 @@
     "jscs": "*",
     "jshint": "*",
     "mocha": "^2.2.1"
-  },
-  "jshintConfig": {
-    "unused": true,
-    "node": true,
-    "mocha": true,
-    "asi": true,
-    "freeze": true,
-    "forin": true,
-    "curly": true
   }
 }
