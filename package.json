@@ -1,10 +1,17 @@
 {
   "name": "atm-common",
   "version": "1.0.0",
-  "description": "",
+  "description": "Shared logic between components of the AllTheMusic project",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "node_modules/.bin/mocha",
+    "test-cov": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha"
+  },
+  "homepage": "https://github.com/allthemusic/atm-common.js",
+  "bugs": "https://github.com/allthemusic/atm-common.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allthemusic/atm-common.js.git"
   },
   "author": "",
   "license": "ISC",
@@ -19,8 +26,13 @@
     "grunt-jsbeautifier": "^0.2.10",
     "grunt-jscs": "^1.5.0",
     "grunt-shell": "^1.1.2",
-    "jscs": "*",
-    "jshint": "*",
+    "istanbul": "^0.3.8",
+    "js-beautify": "^1.5.5",
+    "jscs": "^1.11.3",
+    "jshint": "^2.6.3",
     "mocha": "^2.2.1"
+  },
+  "config": {
+    "ipfs_endpoint": "http://localhost:5001/api/v0"
   }
 }

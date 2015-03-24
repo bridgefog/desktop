@@ -2,3 +2,14 @@ language: node_js
 node_js:
   - stable
   - iojs
+
+script: npm run test-cov
+
+after_script:
+  - npm install -g codeclimate-test-reporter
+  - cat coverage/lcov.info | codeclimate
+
+addons:
+  code_climate:
+    repo_token:
+      secure: "HBFhL4zXirSz1o7hQ99mDmTIxTwcSNP+KOZnj88+g2LrxfUcT5kIpwO8o61ILZdktl+FhISro3Zh0e4zcHTQivGi6VNCbYaCXOJRUy58uSkjAad5EGtNXaU2eTIob4dxe0hrSb1O0TRjIZCJ+9ht9JfZ+VSwPvlGmflpmtz4clM="
