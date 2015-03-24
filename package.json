@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chai": "^2.1.2",
     "form-data": "0.2.0",
     "immutable": "^3.6.4",
     "osenv": "^0.1.0"
