@@ -5,5 +5,8 @@
     "asi": true,
     "freeze": true,
     "forin": true,
-    "curly": true
+    "curly": true,
+    "globals": {
+      "Promise": true
+    }
 }
