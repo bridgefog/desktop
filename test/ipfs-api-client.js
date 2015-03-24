@@ -13,55 +13,36 @@ var knownHashes = {
 
 describe('IPFS API', function () {
   describe('addObject', function () {
-    it('returns a thing with the correct Hash', function (done) {
+    it('returns a thing with the correct Hash', function () {
       var dagNode = new DagObject({
         data: 'foo'
       })
 
-      ipfs.addObject(dagNode, function (error, result) {
-        if (error) {
-          return done(error)
-        }
-
+      return ipfs.addObject(dagNode).then(function (result) {
         assert.deepEqual(result, {
           Hash: knownHashes.foo,
           Links: []
         })
-
-        done()
       })
     })
   })
 
   describe('namePublish / nameResolveSelf', function () {
-    it('can publish a key to itself and then return the key that was published', function (done) {
-      ipfs.namePublish(knownHashes.foo, function (error) {
-        if (error) {
-          return done(error)
-        }
-
-        ipfs.nameResolveSelf(function (error, result) {
-          if (error) {
-            return done(error)
-          }
-
-          assert.deepEqual(result, knownHashes.foo)
-          done()
-        })
+    it('can publish a key to itself and then return the key that was published', function () {
+      return ipfs.namePublish(knownHashes.foo).then(function () {
+        return ipfs.nameResolveSelf()
+      }).then(function (resolvedName) {
+        assert.deepEqual(resolvedName, knownHashes.foo)
       })
     })
   })
 
   describe('nameResolve', function () {
     context('requests /name/resolve with the given peerId', function () {
-      it.skip('returns the resolved key', function (done) {
+      it.skip('returns the resolved key', function () {
         var peerId = 'asdf'
 
-        ipfs.nameResolve(peerId, function (error, hash) {
-          if (error) {
-            return done(error)
-          }
-
+        return ipfs.nameResolve(peerId).then(function (hash) {
           assert.equal(hash, 'abcdef')
         })
       })

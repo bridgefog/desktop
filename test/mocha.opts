@@ -1,5 +1,5 @@
 --reporter list
 --ui bdd
 --check-leaks
---timeout 1000
+--timeout 20000
 --slow 50
