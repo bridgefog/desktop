@@ -17,12 +17,9 @@ var knownHashes = {
 
 describe('IPFS API', function () {
   describe('peerID', function () {
-    it('returns the peerID of this local node', function (done) {
-      ipfs.peerID(function (error, result) {
-        if (error) { return done(error) }
-
+    it('returns the peerID of this local node', function () {
+      return ipfs.peerID().then(function (result) {
         assert.equal(result, ipfsConfig.Identity.PeerID)
-        done()
       })
     })
   })
