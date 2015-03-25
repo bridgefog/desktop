@@ -17,9 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "form-data": "0.2.0",
-    "immutable": "^3.6.4",
-    "osenv": "^0.1.0"
-  },
+    "immutable": "^3.6.4"  },
   "devDependencies": {
     "chai": "^2.1.2",
     "grunt-contrib-jshint": "^0.11.0",
@@ -31,7 +29,8 @@
     "js-beautify": "^1.5.5",
     "jscs": "^1.11.3",
     "jshint": "^2.6.3",
-    "mocha": "^2.2.1"
+    "mocha": "^2.2.1",
+    "osenv": "^0.1.0"
   },
   "config": {
     "ipfs_endpoint": "http://localhost:5001/api/v0"
