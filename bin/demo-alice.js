@@ -2,6 +2,7 @@ var util = require('util')
 var debuglog = util.debuglog('alice');
 var url = require('url')
 var ipfs = require('../lib/ipfs-api-client')(url.parse('http://localhost:5001/api/v0'))
+var DagObject = require('../lib/dag-object')
 
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
@@ -24,24 +25,11 @@ function inventSomeSongs() {
 }
 
 function addSongMetadataNode(metadata) {
-  var obj = new ipfs.DagNode({
+  var obj = new DagObject({
     data: JSON.stringify(metadata)
   })
   debuglog(obj.asJSONforAPI().toString('utf-8'))
-  return addObjectToIPFS(obj)
-}
-
-function addObjectToIPFS(object) {
-  return new Promise(function (resolve, reject) {
-    ipfs.addObject(object, function (error, response) {
-      if (error) {
-        reject(error)
-      } else {
-        debuglog('addObjectToIPFS()', object, response)
-        resolve(response.Hash)
-      }
-    })
-  })
+  return ipfs.addObject(obj)
 }
 
 function addSomeSongs(songs) {
@@ -52,18 +40,19 @@ function addSomeSongs(songs) {
   return Promise.all(addRequests)
 }
 
-function addDirectoryTree(contentsKeys) {
-  var contentsNode = new ipfs.DagNode()
-  for (i = 0; i < contentsKeys.length; i++) {
-    contentsNode = contentsNode.addLink('', contentsKeys[i])
-    debuglog('contentsNode = ', contentsNode)
+function addDirectoryTree(contents) {
+  debuglog(contents)
+  var contentsNode = new DagObject()
+  for (i = 0; i < contents.length; i++) {
+    contentsNode = contentsNode.addLink('', contents[i].Hash)
+    // debuglog('contentsNode = ', contentsNode)
   }
-  return addObjectToIPFS(contentsNode).then(function (contentsNodeHash) {
-    var atmNode = new ipfs.DagNode().addLink('contents', contentsNodeHash)
-    return addObjectToIPFS(atmNode)
-  }).then(function (atmNodeHash) {
-    var directoryNode = new ipfs.DagNode().addLink('allthemusic', atmNodeHash)
-    return addObjectToIPFS(directoryNode)
+  return ipfs.addObject(contentsNode).then(function (contentsNode) {
+    var atmNode = new DagObject().addLink('contents', contentsNode.Hash)
+    return ipfs.addObject(atmNode)
+  }).then(function (atmNode) {
+    var directoryNode = new DagObject().addLink('allthemusic', atmNode.Hash)
+    return ipfs.addObject(directoryNode)
   })
 }
 
@@ -72,20 +61,12 @@ function addDirectoryTree(contentsKeys) {
   addSomeSongs(inventSomeSongs()).then(function (objects) {
     debuglog(objects)
     return addDirectoryTree(objects)
-  }).then(function (directoryNodeHash) {
-    return new Promise(function (resolve, reject) {
-      ipfs.namePublish(directoryNodeHash, function (error) {
-        if (error) {
-          reject(error)
-        } else {
-          resolve()
-        }
-      })
-    })
+  }).then(function (directoryNode) {
+    return ipfs.namePublish(directoryNode.Hash)
   }).catch(function (reason) {
     debuglog('FAILED', reason)
     if (reason instanceof Error) {
-      debuglog(reason.stack)
+      console.log(reason.stack)
     }
   })
 })()

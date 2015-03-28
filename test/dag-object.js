@@ -1,7 +1,7 @@
 'use strict'
 
 var DagObject = require('../lib/dag-object')
-var assert = require('assert')
+var assert = require('chai').assert
 var immutable = require('immutable')
 
 describe('DagObject', function () {
@@ -45,39 +45,53 @@ describe('DagObject', function () {
       assert(node.addLink('fakelink1', 'fakehash1') instanceof DagObject)
     })
 
-    it('adds a link to the object with the given name and hash', function () {
+    it('adds a link to the object with the given name and hash, and maintains order', function () {
       var node = makeNode()
       assert.equal(node.links.size, 0)
+      node = node.addLink('name1', 'hash1')
+        // node = node.addLink('name1', 'hash1')
       node = node.addLink('name2', 'hash2')
-      assert.equal(node.links.size, 1)
-      assert.deepEqual(node.links.toJS(), [{
-        name: 'name2',
-        hash: 'hash2'
-      }])
+      assert.equal(node.links.size, 2)
+      assert.deepEqual(node.links.toJS(), [
+        new DagObject.DagLink('name1', 'hash1', 0),
+        new DagObject.DagLink('name2', 'hash2', 0),
+      ])
     })
   })
 
   describe('asJSONforAPI', function () {
-    var data = 'foobarbaz'
+    function examples(object) {
+      var subject = function () {
+        return object.asJSONforAPI()
+      }
+      return function () {
+        it('"Data" is encoded as base64', function () {
+          var expectedData = new Buffer(object.data || '').toString('base64')
+          var actualData = subject().Data
+          assert.equal(actualData, expectedData)
+        })
 
-    function subject() {
-      return new DagObject({
-        data: data
-      }).asJSONforAPI()
+        it('"Links" look correct', function () {
+          var expectedLinks = object.links.map(function (l) {
+            return {
+              Name: l.name,
+              Hash: l.hash,
+              Size: l.size,
+            }
+          }).toJS()
+          assert.deepEqual(subject().Links, expectedLinks)
+        })
+      }
     }
 
-    it('returns buffer', function () {
-      assert(subject() instanceof Buffer)
-    })
+    context('with only data', examples(new DagObject({
+      data: 'asdf'
+    })))
 
-    it('is encoded as JSON', function () {
-      assert(JSON.parse(subject().toString()))
-    })
+    context('with only links', examples(new DagObject().addLink('name', 'key1').addLink('', 'key2')))
 
-    it('"Data" is encoded as base64', function () {
-      var expectedData = new Buffer(data).toString('base64')
-      var actualData = JSON.parse(subject().toString()).Data
-      assert.equal(actualData, expectedData)
-    })
+    context('with data & links', examples(new DagObject({
+      data: 'foo'
+    }).addLink('name', 'key1').addLink('', 'key2')))
   })
 })

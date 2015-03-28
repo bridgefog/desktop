@@ -41,6 +41,7 @@ describe('IPFS API', function () {
         data: 'foo'
       })
 
+      // TODO: Ensure the body of the request looks right
       return mockIpfs.mock([{
         request: {
           url: '/api/v0/object/put',
