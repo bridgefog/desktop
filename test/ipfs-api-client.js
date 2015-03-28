@@ -23,6 +23,9 @@ describe('IPFS API', function () {
           method: 'GET'
         },
         response: {
+          headers: {
+            'content-type': 'application/json'
+          },
           body: {
             ID: 'this_is_my_peerid'
           }
@@ -51,6 +54,9 @@ describe('IPFS API', function () {
           method: 'POST'
         },
         response: {
+          headers: {
+            'content-type': 'application/json'
+          },
           body: {
             Hash: knownHashes.foo,
             Links: []
@@ -78,6 +84,9 @@ describe('IPFS API', function () {
           method: 'GET'
         },
         response: {
+          headers: {
+            'content-type': 'application/json'
+          },
           body: {
             Name: 'my_peer_id',
             Value: knownHashes.foo,
@@ -105,6 +114,9 @@ describe('IPFS API', function () {
             method: 'GET'
           },
           response: {
+            headers: {
+              'content-type': 'application/json'
+            },
             body: {
               Key: knownHashes.foo
             }
