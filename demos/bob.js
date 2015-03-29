@@ -5,13 +5,19 @@ var R = require('ramda')
 var atm = require('../')
 var ipfs = atm.IPFSClient(atm.util.ipfsEndpoint())
 
-;
-(function () {
-  // TODO: Wear badge
-  // TODO: build peerlist using DHT query. For now, just hard-coded:
-  var peerlist = immutable.Set(['QmQWieUBw1aoqofViCfHcqyEKNxE5XBQX7VtrWcNmhDkGk'])
+var peerlist = immutable.Set()
 
-  ipfs.nameResolve(peerlist.first()).then(function (resolvedKey) {
+function fetchPeers() {
+  // TODO: build peerlist using DHT query. For now, just hard-coded:
+  peerlist = peerlist.union(['QmQWieUBw1aoqofViCfHcqyEKNxE5XBQX7VtrWcNmhDkGk'])
+  return Promise.resolve(peerlist)
+}
+
+exports.run = function () {
+  // TODO: Wear badge
+  fetchPeers().then(function () {
+    return ipfs.nameResolve(peerlist.first())
+  }).then(function (resolvedKey) {
     return ipfs.objectGet(resolvedKey + '/allthemusic/contents')
   }).then(function (thisPeersContents) {
     return immutable.Set().union(R.pluck('Hash', thisPeersContents.Links))
@@ -20,7 +26,7 @@ var ipfs = atm.IPFSClient(atm.util.ipfsEndpoint())
 
     contents.forEach(function (key) {
       ipfs.objectGet(key).then(function (object) {
-        debuglog('got metadata for', key, '=', object)
+        console.log('BOB got metadata for', key, '=', object)
       })
     })
   }).catch(function (reason) {
@@ -29,4 +35,4 @@ var ipfs = atm.IPFSClient(atm.util.ipfsEndpoint())
       console.log(reason.stack)
     }
   })
-})()
+}

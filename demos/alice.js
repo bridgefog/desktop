@@ -45,7 +45,6 @@ function addDirectoryTree(contents) {
   var contentsNode = new DagObject()
   for (i = 0; i < contents.length; i++) {
     contentsNode = contentsNode.addLink('', contents[i].Hash)
-    // debuglog('contentsNode = ', contentsNode)
   }
   return ipfs.addObject(contentsNode).then(function (contentsNode) {
     var atmNode = new DagObject().addLink('contents', contentsNode.Hash)
@@ -56,17 +55,19 @@ function addDirectoryTree(contents) {
   })
 }
 
-(function () {
+exports.run = function () {
   // TODO: Wear badge
   addSomeSongs(inventSomeSongs()).then(function (objects) {
     debuglog(objects)
     return addDirectoryTree(objects)
   }).then(function (directoryNode) {
-    return ipfs.namePublish(directoryNode.Hash)
+    return ipfs.namePublish(directoryNode.Hash).then(function () {
+      console.log('Published key ' + directoryNode.Hash)
+    })
   }).catch(function (reason) {
     debuglog('FAILED', reason)
     if (reason instanceof Error) {
       console.log(reason.stack)
     }
   })
-})()
+}
