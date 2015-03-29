@@ -4,7 +4,7 @@ var url = require('url')
 var R = require('ramda')
 var Stubby = require('stubby').Stubby
 
-var mockIpfsEndpoint = url.parse('http://localhost:48130/api/v0')
+var mockIpfsEndpoint = url.parse('http://localhost:48130')
 
 function IPFSMock(mockEndpoint, stubbyStartOptions) {
   this.stubbyStartOptions = R.merge({
