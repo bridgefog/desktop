@@ -1,0 +1,1 @@
+require('../demos/alice').run()
