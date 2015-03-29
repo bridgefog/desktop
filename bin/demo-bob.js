@@ -1,10 +1,9 @@
-var url = require('url')
 var util = require('util')
 var debuglog = util.debuglog('bob');
 var immutable = require('immutable')
 var R = require('ramda')
-var ipfs = require('../lib/ipfs-api-client')(url.parse('http://107.170.196.28:5001/api/v0'))
-  // var DagObject = require('../lib/dag-object')
+var atm = require('../')
+var ipfs = atm.IPFSClient(atm.util.ipfsEndpoint())
 
 ;
 (function () {

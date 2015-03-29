@@ -1,12 +1,9 @@
 'use strict'
 
-var url = require('url')
 var expect = require('chai').expect
 var Badge = require('../lib/badge')
-var ipfs_endpoint = url.parse(
-    process.env.ipfs_endpoint || process.env.npm_package_config_ipfs_endpoint
-)
-var ipfs = require('../lib/ipfs-api-client')(ipfs_endpoint)
+var ipfsEndpoint = require('../lib/util').ipfsEndpoint
+var ipfs = require('../lib/ipfs-api-client')(ipfsEndpoint())
 
 describe('Badge', function () {
   describe('currentName', function () {

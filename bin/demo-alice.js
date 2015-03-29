@@ -1,8 +1,8 @@
 var util = require('util')
 var debuglog = util.debuglog('alice');
-var url = require('url')
-var ipfs = require('../lib/ipfs-api-client')(url.parse('http://localhost:5001/api/v0'))
-var DagObject = require('../lib/dag-object')
+var atm = require('../')
+var ipfs = atm.IPFSClient(atm.util.ipfsEndpoint())
+var DagObject = atm.DagObject
 
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
