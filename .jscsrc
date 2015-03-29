@@ -1,3 +1,4 @@
 {
-	"preset": "yandex"
+	"preset": "yandex",
+  "esnext": true
 }

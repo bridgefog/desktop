@@ -6,6 +6,7 @@
     "freeze": true,
     "forin": true,
     "curly": true,
+    "esnext": true,
     "globals": {
       "Promise": true
     }
