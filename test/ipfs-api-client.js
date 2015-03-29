@@ -1,6 +1,7 @@
 'use strict'
 
 var assert = require('assert')
+var expect = require('chai').expect
 
 var mockIpfs = require('./mock-ipfs')
 var ipfs = require('../lib/ipfs-api-client')(mockIpfs.endpoint)
@@ -129,4 +130,17 @@ describe('IPFS API', function () {
       })
     })
   })
+
+  describe('dhtFindProvs', function () {
+    context('requests /dht/findprovs with the given contentId', function () {
+      it.skip('returns array of peerIds who have contentId', function () {
+        var contentId = 'asdf'
+
+        return ipfs.dhtFindProvs(contentId).then(function (peerIds) {
+          expect(peerIds).to.equal([''])
+        })
+      })
+    })
+  })
+
 })

@@ -1,10 +1,8 @@
-'use strict'
-
 var url = require('url')
 var expect = require('chai').expect
 var Badge = require('../lib/badge')
 var ipfs_endpoint = url.parse(
-    process.env.ipfs_endpoint || process.env.npm_package_config_ipfs_endpoint
+  process.env.ipfs_endpoint || process.env.npm_package_config_ipfs_endpoint
 )
 var ipfs = require('../lib/ipfs-api-client')(ipfs_endpoint)
 
@@ -22,13 +20,12 @@ describe('Badge', function () {
   })
 
   describe('wear', function () {
-    // this doesn't fail properly
-    it.skip('publishes badge', function () {
+    it('publishes badge', function () {
       var badge = new Badge()
       badge.wear()
 
-      ipfs.peerID().then(function (peerID) {
-        expect(badge.wearers()).to.equal(peerID)
+      return ipfs.peerID().then(function (peerID) {
+        expect(badge.wearers()).to.include(peerID)
       })
     })
   })
