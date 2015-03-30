@@ -2,8 +2,8 @@
 
 var expect = require('chai').expect
 var Badge = require('../lib/badge')
-var ipfsEndpoint = require('../lib/util').ipfsEndpoint
-var ipfs = require('../lib/ipfs-api-client')(ipfsEndpoint())
+  // var ipfsEndpoint = require('../lib/util').ipfsEndpoint
+  // var ipfs = require('../lib/ipfs-api-client')(ipfsEndpoint())
 
 describe('Badge', function () {
   describe('currentName', function () {
