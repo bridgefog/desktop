@@ -131,13 +131,35 @@ describe('IPFS API', function () {
     })
   })
 
-  describe('dhtFindProvs', function () {
-    context('requests /dht/findprovs with the given contentId', function () {
-      it.skip('returns array of peerIds who have contentId', function () {
-        var contentId = 'asdf'
+  describe('dhtFindprovs', function () {
+    context('requests /dht/findprovs with the given contentID', function () {
+      it('returns array of peerIds who have contentID', function () {
+        var contentID = 'this_is_content_id'
 
-        return ipfs.dhtFindProvs(contentId).then(function (peerIds) {
-          expect(peerIds).to.equal([''])
+        var mock = mockIpfs.mock([{
+          request: {
+            url: '/api/v0/dht/findprovs/this_is_content_id',
+            method: 'GET'
+          },
+          response: {
+            headers: {'content-type': 'application/json'},
+            body: {
+              Extra: '',
+              ID: '',
+              Responses: [
+                {Addrs: null, ID: 'peer_id_1'},
+                {Addrs: null, ID: 'peer_id_2'},
+                {Addrs: null, ID: 'peer_id_3'},
+              ],
+              Type: 4
+            }
+          }
+        }])
+
+        var peerIDs = mock.then(function () { return ipfs.dhtFindprovs(contentID) })
+
+        return peerIDs.then(function (peerIDs) {
+          expect(peerIDs).to.eql(['peer_id_1', 'peer_id_2', 'peer_id_3'])
         })
       })
     })
