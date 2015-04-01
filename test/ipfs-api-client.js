@@ -132,7 +132,7 @@ describe('IPFS API', function () {
   })
 
   describe('dhtFindprovs', function () {
-    context('requests /dht/findprovs with the given contentID', function () {
+    context('the given contentID', function () {
       it('returns array of peerIds who have contentID', function () {
         var contentID = 'this_is_content_id'
 
