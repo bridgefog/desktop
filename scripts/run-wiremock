@@ -1,6 +1,7 @@
 #!/bin/bash
 set -ex
 
+mkdir -p test/wiremock_scope
 cd test/wiremock_scope
 
 wiremock_jar='wiremock-1.54-standalone.jar'
