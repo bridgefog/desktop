@@ -4,7 +4,7 @@ var url = require('url')
 var R = require('ramda')
 var Stubby = require('stubby').Stubby
 
-var mockIpfsEndpoint = url.parse('http://localhost:48130/api/v0')
+var mockIpfsEndpoint = url.parse('http://localhost:48130')
 
 function IPFSMock(mockEndpoint, stubbyStartOptions) {
   this.stubbyStartOptions = R.merge({
@@ -21,7 +21,7 @@ IPFSMock.prototype.start = function () {
     this.startPromise = new Promise(function (resolve, reject) {
       self.stubby.start(self.stubbyStartOptions, function (error) {
         if (error) {
-          reject(error)
+          return reject(error)
         }
         resolve(self.stubby)
       })
@@ -35,7 +35,7 @@ IPFSMock.prototype.mock = function (options) {
     return new Promise(function (resolve, reject) {
       ipfsMock.post(options, function (error) {
         if (error) {
-          reject(error)
+          return reject(error)
         }
         resolve(ipfsMock)
       })
@@ -48,10 +48,23 @@ IPFSMock.prototype.reset = function () {
     return new Promise(function (resolve, reject) {
       ipfsMock['delete'](function (error) {
         if (error) {
-          reject(error)
+          return reject(error)
         }
         resolve(ipfsMock)
       })
+    })
+  })
+}
+
+IPFSMock.prototype.stop = function () {
+  var self = this
+  return new Promise(function (resolve, reject) {
+    self.stubby.stop(function (error) {
+      delete self.startPromise
+      if (error) {
+        return reject(error)
+      }
+      resolve()
     })
   })
 }
