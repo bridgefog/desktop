@@ -4,8 +4,8 @@
   "description": "Shared logic between components of the AllTheMusic project",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/mocha --harmony",
-    "test-cov": "node_modules/.bin/istanbul-harmony cover node_modules/.bin/_mocha --harmony"
+    "test": "node_modules/.bin/mocha",
+    "test-cov": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha"
   },
   "homepage": "https://github.com/allthemusic/atm-common.js",
   "bugs": "https://github.com/allthemusic/atm-common.js/issues",
