@@ -19,7 +19,7 @@ describe('Badge', function () {
   })
 
   describe('wear', function () {
-    it('publishes badge', function () {
+    it.skip('publishes badge', function () {
       var badge = new Badge()
       badge.wear()
 
