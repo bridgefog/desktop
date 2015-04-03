@@ -8,6 +8,9 @@
     "curly": true,
     "esnext": true,
     "globals": {
-      "Promise": true
+      "Promise": true,
+      "Blob": true,
+      "XMLHttpRequest": true,
+      "FormData": true
     }
 }

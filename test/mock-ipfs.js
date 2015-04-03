@@ -46,7 +46,7 @@ IPFSMock.prototype.mock = function (options) {
 IPFSMock.prototype.reset = function () {
   return this.start().then(function (ipfsMock) {
     return new Promise(function (resolve, reject) {
-      ipfsMock['delete'](function (error) {
+      ipfsMock.delete(function (error) {
         if (error) {
           return reject(error)
         }

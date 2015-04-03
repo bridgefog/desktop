@@ -21,16 +21,12 @@ describe('IPFS API', function () {
       return mockIpfs.mock([{
         request: {
           url: '/api/v0/id',
-          method: 'GET'
+          method: 'GET',
         },
         response: {
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: {
-            ID: 'this_is_my_peerid'
-          }
-        }
+          headers: { 'content-type': 'application/json' },
+          body: { ID: 'this_is_my_peerid' },
+        },
       }]).then(
         ipfs.peerID
       ).then(function (result) {
@@ -49,26 +45,22 @@ describe('IPFS API', function () {
       return mockIpfs.mock([{
         request: {
           url: '/api/v0/object/put',
-          query: {
-            arg: 'json',
-          },
-          method: 'POST'
+          query: { arg: 'json' },
+          method: 'POST',
         },
         response: {
-          headers: {
-            'content-type': 'application/json'
-          },
+          headers: { 'content-type': 'application/json' },
           body: {
             Hash: knownHashes.foo,
-            Links: []
-          }
-        }
+            Links: [],
+          },
+        },
       }]).then(function () {
         return ipfs.addObject(dagNode)
       }).then(function (result) {
         assert.deepEqual(result, {
           Hash: knownHashes.foo,
-          Links: []
+          Links: [],
         })
       })
     })
@@ -79,20 +71,16 @@ describe('IPFS API', function () {
       return mockIpfs.mock([{
         request: {
           url: '/api/v0/name/publish',
-          query: {
-            arg: knownHashes.foo,
-          },
-          method: 'GET'
+          query: { arg: knownHashes.foo },
+          method: 'GET',
         },
         response: {
-          headers: {
-            'content-type': 'application/json'
-          },
+          headers: { 'content-type': 'application/json' },
           body: {
             Name: 'my_peer_id',
             Value: knownHashes.foo,
-          }
-        }
+          },
+        },
       }]).then(function () {
         return ipfs.namePublish(knownHashes.foo)
       }).then(function (response) {
@@ -109,19 +97,13 @@ describe('IPFS API', function () {
         return mockIpfs.mock([{
           request: {
             url: '/api/v0/name/resolve',
-            query: {
-              arg: peerId,
-            },
-            method: 'GET'
+            query: { arg: peerId },
+            method: 'GET',
           },
           response: {
-            headers: {
-              'content-type': 'application/json'
-            },
-            body: {
-              Key: knownHashes.foo
-            }
-          }
+            headers: { 'content-type': 'application/json' },
+            body: { Key: knownHashes.foo },
+          },
         }]).then(function () {
           return ipfs.nameResolve(peerId)
         }).then(function (hash) {
@@ -139,21 +121,21 @@ describe('IPFS API', function () {
         var mock = mockIpfs.mock([{
           request: {
             url: '/api/v0/dht/findprovs/this_is_content_id',
-            method: 'GET'
+            method: 'GET',
           },
           response: {
-            headers: {'content-type': 'application/json'},
+            headers: { 'content-type': 'application/json' },
             body: {
               Extra: '',
               ID: '',
               Responses: [
-                {Addrs: null, ID: 'peer_id_1'},
-                {Addrs: null, ID: 'peer_id_2'},
-                {Addrs: null, ID: 'peer_id_3'},
+                { Addrs: null, ID: 'peer_id_1' },
+                { Addrs: null, ID: 'peer_id_2' },
+                { Addrs: null, ID: 'peer_id_3' },
               ],
-              Type: 4
-            }
-          }
+              Type: 4,
+            },
+          },
         }])
 
         var peerIDs = mock.then(function () { return ipfs.dhtFindprovs(contentID) })

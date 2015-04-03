@@ -25,9 +25,7 @@ function inventSomeSongs() {
 }
 
 function addSongMetadataNode(metadata) {
-  var obj = new DagObject({
-    data: JSON.stringify(metadata)
-  })
+  var obj = new DagObject({ data: JSON.stringify(metadata) })
   debuglog(obj.asJSONforAPI().toString('utf-8'))
   return ipfs.addObject(obj)
 }

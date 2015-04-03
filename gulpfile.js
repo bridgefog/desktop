@@ -8,7 +8,6 @@ var browserify = require('browserify')
 var mocha = require('gulp-mocha')
 var jshint = require('gulp-jshint')
 var jscs = require('gulp-jscs')
-var jsbeautifier = require('gulp-jsbeautifier')
 
 var ipfsMock = require('./test/mock-ipfs')
 
@@ -55,14 +54,6 @@ gulp.task('jshint', function () {
 })
 gulp.task('lint', ['jscs', 'jshint'])
 
-gulp.task('format-js', function () {
-  gulp.src(['{lib,test,bin,demos,script}/**/*.js', 'package.json', '*.js'])
-    .pipe(jsbeautifier({
-      config: '.jsbeautifyrc',
-      mode: 'VERIFY_AND_WRITE'
-    }))
-    .pipe(gulp.dest('.'))
-})
 
 gulp.task('mocha', function () {
   return gulp.src(['test/*.js'], {

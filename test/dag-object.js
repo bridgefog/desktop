@@ -16,9 +16,7 @@ describe('DagObject', function () {
 
     context('with just links', function () {
       it('has links but no data', function () {
-        var node = new DagObject({
-          links: immutable.Set([1, 2, 3])
-        })
+        var node = new DagObject({ links: immutable.Set([1, 2, 3]) })
         assert.equal(node.data, null)
         assert.equal(node.links.size, 3)
         assert.deepEqual(node.links.toJS(), [1, 2, 3])
@@ -27,9 +25,7 @@ describe('DagObject', function () {
 
     context('with just data', function () {
       it('has data but no links', function () {
-        var node = new DagObject({
-          data: 'foobarbaz'
-        })
+        var node = new DagObject({ data: 'foobarbaz' })
         assert.equal(node.data, 'foobarbaz')
       })
     })
@@ -49,7 +45,7 @@ describe('DagObject', function () {
       var node = makeNode()
       assert.equal(node.links.size, 0)
       node = node.addLink('name1', 'hash1')
-        // node = node.addLink('name1', 'hash1')
+      // node = node.addLink('name1', 'hash1')
       node = node.addLink('name2', 'hash2')
       assert.equal(node.links.size, 2)
       assert.deepEqual(node.links.toJS(), [
@@ -84,14 +80,14 @@ describe('DagObject', function () {
       }
     }
 
-    context('with only data', examples(new DagObject({
-      data: 'asdf'
-    })))
+    context('with only data', examples(new DagObject({ data: 'asdf' })))
 
-    context('with only links', examples(new DagObject().addLink('name', 'key1').addLink('', 'key2')))
+    context('with only links', examples(new DagObject()
+                                        .addLink('name', 'key1')
+                                        .addLink('', 'key2')))
 
-    context('with data & links', examples(new DagObject({
-      data: 'foo'
-    }).addLink('name', 'key1').addLink('', 'key2')))
+    context('with data & links', examples(new DagObject({ data: 'foo' })
+                                          .addLink('name', 'key1')
+                                          .addLink('', 'key2')))
   })
 })
