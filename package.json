@@ -41,7 +41,7 @@
     "watchify": "^3.0.0"
   },
   "config": {
-    "ipfs_endpoint": "http://localhost:5001/api/v0"
+    "ipfs_endpoint": "http://localhost:5001"
   },
   "browser": {
     "./lib/http-post-form.js": "./lib/http-post-form-browser.js"
