@@ -20,6 +20,8 @@
     "immutable": "^3.6.4"
   },
   "devDependencies": {
+    "babelify": "^5.0.4",
+    "browser-sync": "^2.5.2",
     "browserify": "^9.0.3",
     "chai": "^2.1.2",
     "gulp": "^3.8.11",
