@@ -7,6 +7,7 @@ var ipfsMock = require('./test/mock-ipfs')
 var jscs = require('gulp-jscs')
 var jshint = require('gulp-jshint')
 var mocha = require('gulp-mocha')
+var mochaReporter = require('./test/support/gulp-mocha-reporter')
 var source = require('vinyl-source-stream')
 var sourcemaps = require('gulp-sourcemaps');
 var watchify = require('watchify');
@@ -51,7 +52,7 @@ gulp.task('watch-lint', function () {
 
 gulp.task('mocha', function () {
   return gulp.src(['test/*.js'], { read: false })
-    .pipe(mocha({ reporter: 'spec' }))
+    .pipe(mocha({ reporter: mochaReporter }))
     .once('end', function () {
       ipfsMock.stop()
     })
