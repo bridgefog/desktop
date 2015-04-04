@@ -4,7 +4,7 @@
   "description": "Shared logic between components of the AllTheMusic project",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/mocha",
+    "test": "node_modules/.bin/gulp test",
     "test-cov": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha"
   },
   "homepage": "https://github.com/allthemusic/atm-common.js",

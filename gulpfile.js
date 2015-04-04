@@ -64,10 +64,18 @@ gulp.task('watch-mocha', function () {
   gulp.watch(['lib/**', 'test/**'], ['mocha'])
 })
 
-gulp.task('default', ['watch-lint', 'watch-mocha', 'browser-bundle', 'test'])
+gulp.task('default', [
+  'watch-lint',
+  'watch-mocha',
+  'browser-bundle',
+  'test',
+  'watch-gulpfile',
+])
 
-// run a gulp loop like this: `(set -e; while true; do clear; gulp; done)`
-gulp.watch(__filename, function () {
-  gutil.log(__filename + ' has changed; exiting.')
-  process.exit()
+gulp.task('watch-gulpfile', function () {
+  // run a gulp loop like this: `(set -e; while true; do clear; gulp; done)`
+  return gulp.watch(__filename, function () {
+    gutil.log(__filename + ' has changed; exiting.')
+    process.exit()
+  })
 })
