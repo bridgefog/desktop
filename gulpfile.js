@@ -9,8 +9,8 @@ var jshint = require('gulp-jshint')
 var mocha = require('gulp-mocha')
 var mochaReporter = require('./test/support/gulp-mocha-reporter')
 var source = require('vinyl-source-stream')
-var sourcemaps = require('gulp-sourcemaps');
-var watchify = require('watchify');
+var sourcemaps = require('gulp-sourcemaps')
+var watchify = require('watchify')
 
 var bundler = watchify(browserify(watchify.args))
 
@@ -54,13 +54,20 @@ gulp.task('mocha', function () {
   return gulp.src(['test/*.js'], { read: false })
     .pipe(mocha({ reporter: mochaReporter }))
     .once('end', function () {
-      ipfsMock.stop()
+      return ipfsMock.stop()
     })
-    .on('error', gutil.log)
 })
+
+gulp.task('test', ['mocha', 'lint'])
 
 gulp.task('watch-mocha', function () {
   gulp.watch(['lib/**', 'test/**'], ['mocha'])
 })
 
-gulp.task('default', ['watch-lint', 'watch-mocha', 'browser-bundle'])
+gulp.task('default', ['watch-lint', 'watch-mocha', 'browser-bundle', 'test'])
+
+// run a gulp loop like this: `(set -e; while true; do clear; gulp; done)`
+gulp.watch(__filename, function () {
+  gutil.log(__filename + ' has changed; exiting.')
+  process.exit()
+})
