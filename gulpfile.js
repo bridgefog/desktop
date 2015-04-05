@@ -12,6 +12,13 @@ var source = require('vinyl-source-stream')
 var sourcemaps = require('gulp-sourcemaps')
 var watchify = require('watchify')
 
+var globs = {
+  javascripts: ['{lib,test,bin,demos,script}/**/*.js', '*.js'],
+  package_json: ['package.json'],
+  rc_files: ['.js*rc'],
+  tests: ['test/*.js'],
+}
+
 var bundler = watchify(browserify(watchify.args))
 
 function buildBrowserBundle() {
@@ -34,12 +41,12 @@ bundler.on('log', gutil.log)
 gulp.task('browser-bundle', buildBrowserBundle)
 
 gulp.task('jscs', function () {
-  return gulp.src(['{lib,test,bin,demos,script}/**/*.js', '*.js'])
+  return gulp.src(globs.javascripts)
     .pipe(jscs())
 })
 
 gulp.task('jshint', function () {
-  return gulp.src(['{lib,test,bin,demos,script}/**/*.js', 'package.json', '*.js', '.js*rc'])
+  return gulp.src(globs.javascripts + globs.package_json + globs.rc_files)
     .pipe(jshint())
     .pipe(jshint.reporter('jshint-stylish'))
 })
@@ -47,11 +54,11 @@ gulp.task('jshint', function () {
 gulp.task('lint', ['jscs', 'jshint'])
 
 gulp.task('watch-lint', function () {
-  return gulp.watch(['{lib,test,bin,demos,script}/**/*.js', '*.js'], ['lint'])
+  return gulp.watch(globs.javascripts, ['lint'])
 })
 
 gulp.task('mocha', function () {
-  return gulp.src(['test/*.js'], { read: false })
+  return gulp.src(globs.tests, { read: false })
     .pipe(mocha({ reporter: mochaReporter }))
     .once('end', function () {
       return ipfsMock.stop()
@@ -61,7 +68,7 @@ gulp.task('mocha', function () {
 gulp.task('test', ['mocha', 'lint'])
 
 gulp.task('watch-mocha', function () {
-  gulp.watch(['lib/**', 'test/**'], ['mocha'])
+  gulp.watch(globs.javascripts, ['mocha'])
 })
 
 gulp.task('default', [
