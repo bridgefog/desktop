@@ -1,0 +1,45 @@
+{
+  "name": "atm-desktop",
+  "version": "1.0.0",
+  "description": "Desktop application for AllTheMusic",
+  "main": "main.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allthemusic/desktop.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/allthemusic/desktop/issues"
+  },
+  "homepage": "https://github.com/allthemusic/desktop",
+  "devDependencies": {
+    "atom-shell": "^0.22.3",
+    "gulp": "^3.8.11",
+    "babel": "^5.0.8",
+    "babelify": "^5.0.4",
+    "browser-sync": "^2.5.2",
+    "browserify": "^9.0.3",
+    "chai": "^2.1.2",
+    "gulp-jscs": "*",
+    "gulp-jshint": "^1.9.4",
+    "gulp-mocha": "^2.0.1",
+    "gulp-sourcemaps": "^1.5.1",
+    "gulp-util": "^3.0.4",
+    "istanbul": "^0.3.8",
+    "js-beautify": "^1.5.5",
+    "jscs": "^1.11.3",
+    "jshint": "^2.6.3",
+    "jshint-stylish": "^1.0.1",
+    "mocha": "^2.2.1",
+    "stubby": "^0.2.11",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.0.0"
+  },
+  "dependencies": {
+    "st": "^0.5.3",
+    "http-proxy": "*"
+  }
+}
