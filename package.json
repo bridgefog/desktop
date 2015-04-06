@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "form-data": "0.2.0",
+    "ramda": "^0.13.0",
     "immutable": "^3.6.4"
   },
   "devDependencies": {
@@ -36,7 +37,6 @@
     "jshint": "^2.6.3",
     "jshint-stylish": "^1.0.1",
     "mocha": "^2.2.1",
-    "ramda": "^0.13.0",
     "stubby": "^0.2.11",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
