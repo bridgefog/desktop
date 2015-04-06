@@ -29,6 +29,7 @@ describe('IPFS API', function () {
         },
       }]).then(
         ipfs.peerID
+      // ).then(result => assert.equal(result, 'this_is_my_peerid'))
       ).then(function (result) {
         assert.equal(result, 'this_is_my_peerid')
       })
@@ -37,9 +38,7 @@ describe('IPFS API', function () {
 
   describe('objectPut', function () {
     it('returns a thing with the correct Hash', function () {
-      var dagNode = new DagObject({
-        data: 'foo'
-      })
+      var dagNode = new DagObject({ data: 'foo' })
 
       // TODO: Ensure the body of the request looks right
       return mockIpfs.mock([{
@@ -143,5 +142,4 @@ describe('IPFS API', function () {
       })
     })
   })
-
 })

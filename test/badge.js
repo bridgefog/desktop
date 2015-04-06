@@ -2,30 +2,29 @@
 
 var expect = require('chai').expect
 var Badge = require('../lib/badge')
-var util = require('../lib/util')
-var ipfs = require('../lib/ipfs-api-client')(util.ipfsEndpoint())
 
 describe('Badge', function () {
-  describe('currentName', function () {
+  describe('name calculation', function () {
     var now = Date.now()
 
-    function subject() {
-      return new Badge().currentName(now)
+    function subject(nameSpace) {
+      return new Badge(nameSpace, now)
     }
 
-    it('returns the current string to be hashed into a badge', function () {
-      expect(subject()).to.eql('AllTheMusic:' + Math.round(now / (1000 * 60 * 60)))
+    it('generates the correct string without a nameSpace', function () {
+      expect(subject().name).to.
+        eql('AllTheMusic:' + Math.round(now / (1000 * 60 * 60)))
+    })
+
+    it('generates the correct string with a nameSpace', function () {
+      var namespace = 'search-term:Queen'
+      expect(subject(namespace).name).to.
+        eql('AllTheMusic:' + namespace + Math.round(now / (1000 * 60 * 60)))
     })
   })
 
-  describe('wear', function () {
-    it.skip('publishes badge', function () {
-      var badge = new Badge()
-      badge.wear()
-
-      return ipfs.peerID().then(function (peerID) {
-        expect(badge.wearers()).to.include(peerID)
-      })
+  describe('dagObject', function () {
+    it.skip('returns a DagObject with the data property set appropriately', function () {
     })
   })
 })
