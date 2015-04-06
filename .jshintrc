@@ -1,0 +1,14 @@
+{
+    "unused": true,
+    "node": true,
+    "browser": true,
+    "mocha": true,
+    "asi": true,
+    "freeze": true,
+    "forin": true,
+    "curly": true,
+    "esnext": true,
+    "globals": {
+      "Promise": true
+    }
+}
