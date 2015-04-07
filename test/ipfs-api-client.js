@@ -35,7 +35,7 @@ describe('IPFS API', function () {
     })
   })
 
-  describe('addObject', function () {
+  describe('objectPut', function () {
     it('returns a thing with the correct Hash', function () {
       var dagNode = new DagObject({
         data: 'foo'
@@ -56,12 +56,9 @@ describe('IPFS API', function () {
           },
         },
       }]).then(function () {
-        return ipfs.addObject(dagNode)
+        return ipfs.objectPut(dagNode)
       }).then(function (result) {
-        assert.deepEqual(result, {
-          Hash: knownHashes.foo,
-          Links: [],
-        })
+        assert.equal(result, knownHashes.foo)
       })
     })
   })
