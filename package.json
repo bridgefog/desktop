@@ -38,6 +38,7 @@
     "jshint": "^2.6.3",
     "jshint-stylish": "^1.0.1",
     "mocha": "^2.2.1",
+    "sinon": "^1.14.1",
     "stubby": "^0.2.11",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
