@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - iojs
 
-script: npm run test-cov
+script: npm run ci
 
 after_script:
   - npm install -g codeclimate-test-reporter

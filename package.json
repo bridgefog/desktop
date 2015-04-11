@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/gulp test",
-    "test-cov": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha"
+    "ci": "node_modules/.bin/istanbul cover node_modules/.bin/gulp test"
   },
   "homepage": "https://github.com/allthemusic/atm-common.js",
   "bugs": "https://github.com/allthemusic/atm-common.js/issues",
