@@ -1,8 +1,6 @@
 'use strict'
 
-var assert = require('assert')
-var expect = require('chai').expect
-
+var assert = require('chai').assert
 var mockIpfs = require('./mock-ipfs')
 var ipfs = require('../lib/ipfs-api-client')(mockIpfs.endpoint)
 var DagObject = require('../lib/dag-object')
@@ -27,12 +25,9 @@ describe('IPFS API', function () {
           headers: { 'content-type': 'application/json' },
           body: { ID: 'this_is_my_peerid' },
         },
-      }]).then(
-        ipfs.peerID
-      // ).then(result => assert.equal(result, 'this_is_my_peerid'))
-      ).then(function (result) {
-        assert.equal(result, 'this_is_my_peerid')
-      })
+      }])
+      .then(ipfs.peerID)
+      .then(result => assert.equal(result, 'this_is_my_peerid'))
     })
   })
 
@@ -54,11 +49,9 @@ describe('IPFS API', function () {
             Links: [],
           },
         },
-      }]).then(function () {
-        return ipfs.objectPut(dagNode)
-      }).then(function (result) {
-        assert.equal(result, knownHashes.foo)
-      })
+      }])
+      .then(() => ipfs.objectPut(dagNode))
+      .then(result => assert.equal(result, knownHashes.foo))
     })
   })
 
@@ -77,11 +70,9 @@ describe('IPFS API', function () {
             Value: knownHashes.foo,
           },
         },
-      }]).then(function () {
-        return ipfs.namePublish(knownHashes.foo)
-      }).then(function (response) {
-        assert.deepEqual(response.Value, knownHashes.foo)
-      })
+      }])
+      .then(() => ipfs.namePublish(knownHashes.foo))
+      .then(response => assert.deepEqual(response.Value, knownHashes.foo))
     })
   })
 
@@ -100,11 +91,9 @@ describe('IPFS API', function () {
             headers: { 'content-type': 'application/json' },
             body: { Key: knownHashes.foo },
           },
-        }]).then(function () {
-          return ipfs.nameResolve(peerId)
-        }).then(function (hash) {
-          assert.equal(hash, knownHashes.foo)
-        })
+        }])
+        .then(function () { return ipfs.nameResolve(peerId) })
+        .then(function (hash) { assert.equal(hash, knownHashes.foo) })
       })
     })
   })
@@ -114,7 +103,7 @@ describe('IPFS API', function () {
       it('returns array of peerIds who have contentID', function () {
         var contentID = 'this_is_content_id'
 
-        var mock = mockIpfs.mock([{
+        return mockIpfs.mock([{
           request: {
             url: '/api/v0/dht/findprovs/this_is_content_id',
             method: 'GET',
@@ -133,12 +122,8 @@ describe('IPFS API', function () {
             },
           },
         }])
-
-        var peerIDs = mock.then(function () { return ipfs.dhtFindprovs(contentID) })
-
-        return peerIDs.then(function (peerIDs) {
-          expect(peerIDs).to.eql(['peer_id_1', 'peer_id_2', 'peer_id_3'])
-        })
+        .then(() => ipfs.dhtFindprovs(contentID))
+        .then((peerIDs) => assert.deepEqual(peerIDs, ['peer_id_1', 'peer_id_2', 'peer_id_3']))
       })
     })
   })
