@@ -8,7 +8,7 @@ var BrowserWindow = require('browser-window')
 
 console.log('process.versions =', process.versions)
 
-var Server = require('./lib/server')
+var Server = require('atm-app/dev-support/server')
 
 // Report crashes to our server.
 require('crash-reporter').start()
@@ -18,13 +18,11 @@ require('crash-reporter').start()
 var mainWindow = null
 
 var server = new Server({
-  port: 4023,
   ipfs: {
     host: 'localhost',
     gatewayPort: 8080,
     apiPort: 5001,
   },
-  rootDir: process.cwd() + '/renderer',
 })
 
 var appIcon = null;

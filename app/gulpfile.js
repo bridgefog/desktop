@@ -1,5 +1,6 @@
 var babelify = require('babelify')
 var browserify = require('browserify')
+var browserSync = require('browser-sync')
 var buffer = require('vinyl-buffer')
 var gulp = require('gulp')
 var gutil = require('gulp-util')
@@ -9,7 +10,7 @@ var mocha = require('gulp-mocha')
 var source = require('vinyl-source-stream')
 var sourcemaps = require('gulp-sourcemaps')
 var watchify = require('watchify')
-var Server = require('../atom/lib/server')
+var ipfsProxy = require('./dev-support/ipfs-proxy')
 
 var globs = {
   javascripts: ['{lib,test,bin,demos,script}/**/*.js', '*.js'],
@@ -18,26 +19,30 @@ var globs = {
   tests: ['test/*.js'],
 }
 
-var bundler = watchify(browserify(watchify.args))
+var bundler = watchify(browserify({
+  debug: true,
+  cache: {},
+  packageCache: {},
+})).
+  transform(babelify).
+  require('ramda').
+  add('./index.js').
+  on('update', buildBrowserBundle).
+  on('log', gutil.log)
 
 function buildBrowserBundle() {
-  bundler
-    .transform(babelify)
-    .bundle()
+  browserSync.notify('compiling')
+  return bundler.bundle()
     .on('error', gutil.log.bind(gutil, 'Browserify Error')) // log errors if they happen
-    .pipe(source('bundle.js'))
+    .pipe(source('index.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({ loadMaps: true })) // loads map from browserify file
     .pipe(sourcemaps.write('./')) // writes .map file
     .pipe(gulp.dest('./browser'))
+    .pipe(browserSync.reload({ stream: true }))
 }
 
-bundler.add('./index.js')
-
-bundler.on('update', buildBrowserBundle)
-bundler.on('log', gutil.log)
-
-gulp.task('browser-bundle', buildBrowserBundle)
+gulp.task('js-bundle', buildBrowserBundle)
 
 gulp.task('jscs', function () {
   return gulp.src(globs.javascripts)
@@ -50,42 +55,26 @@ gulp.task('jshint', function () {
     .pipe(jshint.reporter('jshint-stylish'))
 })
 
-gulp.task('lint', ['jscs', 'jshint'])
-
-gulp.task('watch-lint', function () {
-  return gulp.watch(globs.javascripts, ['lint'])
-})
-
 gulp.task('mocha', function () {
   return gulp.src(globs.tests, { read: false })
     .pipe(mocha())
 })
 
-gulp.task('test', ['mocha', 'lint'])
-
 gulp.task('watch-mocha', function () {
   gulp.watch(globs.javascripts, ['mocha'])
 })
 
-gulp.task('dev-server', function () {
-  new Server({
-    port: 4023,
-    ipfs: {
-      host: 'localhost',
-      gatewayPort: 8080,
-      apiPort: 5001,
+gulp.task('dev-server', ['js-bundle'], function () {
+  return browserSync({
+    open: false,
+    server: {
+      baseDir: './',
+      middleware: [
+        ipfsProxy({ host: 'localhost', gatewayPort: 8080, apiPort: 5001 })
+      ],
     },
-    rootDir: process.cwd(),
   })
 })
-
-gulp.task('default', [
-  'watch-lint',
-  'watch-mocha',
-  'browser-bundle',
-  'test',
-  'watch-gulpfile',
-])
 
 gulp.task('watch-gulpfile', function () {
   // run a gulp loop like this: `(set -e; while true; do clear; gulp; done)`
@@ -94,3 +83,20 @@ gulp.task('watch-gulpfile', function () {
     process.exit()
   })
 })
+
+gulp.task('lint', ['jscs', 'jshint'])
+
+gulp.task('watch-lint', function () {
+  return gulp.watch(globs.javascripts, ['lint'])
+})
+
+gulp.task('test', ['mocha', 'lint'])
+
+gulp.task('default', [
+  'watch-lint',
+  'watch-mocha',
+  'js-bundle',
+  'test',
+  'watch-gulpfile',
+  'dev-server',
+])
