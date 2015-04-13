@@ -20,11 +20,14 @@ var globs = {
   tests: ['test/*.js'],
 }
 
-var bundler = watchify(browserify(watchify.args))
+var bundler = watchify(browserify(watchify.args)).
+  transform(babelify).
+  add('./index.js').
+  on('update', buildBrowserBundle).
+  on('log', gutil.log)
 
 function buildBrowserBundle() {
   bundler
-    .transform(babelify)
     .bundle()
     .on('error', gutil.log.bind(gutil, 'Browserify Error')) // log errors if they happen
     .pipe(source('bundle.js'))
@@ -33,11 +36,6 @@ function buildBrowserBundle() {
     .pipe(sourcemaps.write('./')) // writes .map file
     .pipe(gulp.dest('./browser'))
 }
-
-bundler.add('./index.js')
-
-bundler.on('update', buildBrowserBundle)
-bundler.on('log', gutil.log)
 
 gulp.task('browser-bundle', buildBrowserBundle)
 

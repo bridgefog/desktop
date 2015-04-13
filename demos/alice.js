@@ -17,7 +17,7 @@ function inventMetadataNode() {
 
 function inventSomeSongs() {
   var songs = []
-  for (i = 0; i <= 10; i++) {
+  for (var i = 0; i <= 10; i++) {
     songs[i] = inventMetadataNode()
     debuglog('songs[%d] =', i, songs[i])
   }
@@ -32,7 +32,7 @@ function addSongMetadataNode(metadata) {
 
 function addSomeSongs(songs) {
   var addRequests = []
-  for (i = 0; i < songs.length; i++) {
+  for (var i = 0; i < songs.length; i++) {
     addRequests[i] = addSongMetadataNode(songs[i])
   }
   return Promise.all(addRequests)
@@ -41,14 +41,14 @@ function addSomeSongs(songs) {
 function addDirectoryTree(contents) {
   debuglog(contents)
   var contentsNode = new DagObject()
-  for (i = 0; i < contents.length; i++) {
-    contentsNode = contentsNode.addLink('', contents[i].Hash)
+  for (var i = 0; i < contents.length; i++) {
+    contentsNode = contentsNode.addLink('', contents[i])
   }
   return ipfs.addObject(contentsNode).then(function (contentsNode) {
-    var atmNode = new DagObject().addLink('contents', contentsNode.Hash)
+    var atmNode = new DagObject().addLink('contents', contentsNode)
     return ipfs.addObject(atmNode)
   }).then(function (atmNode) {
-    var directoryNode = new DagObject().addLink('allthemusic', atmNode.Hash)
+    var directoryNode = new DagObject().addLink('allthemusic', atmNode)
     return ipfs.addObject(directoryNode)
   })
 }
@@ -59,8 +59,8 @@ exports.run = function () {
     debuglog(objects)
     return addDirectoryTree(objects)
   }).then(function (directoryNode) {
-    return ipfs.namePublish(directoryNode.Hash).then(function () {
-      console.log('Published key ' + directoryNode.Hash)
+    return ipfs.namePublish(directoryNode).then(function () {
+      console.log('Published key ' + directoryNode)
     })
   }).catch(function (reason) {
     debuglog('FAILED', reason)
