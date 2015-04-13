@@ -49,5 +49,10 @@
   },
   "browser": {
     "./lib/http-post-form.js": "./lib/http-post-form-browser.js"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
   }
 }

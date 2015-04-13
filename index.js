@@ -5,4 +5,5 @@ module.exports = {
   IPFSClient: require('./lib/ipfs-api-client'),
   util: require('./lib/util'),
   Badge: require('./lib/badge'),
+  Clubnet: require('./lib/clubnet'),
 }
