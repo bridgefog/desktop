@@ -1,11 +1,14 @@
-var util = require('util')
+'use strict'
+
+import util from 'util'
+import { Set } from 'immutable'
+import R from 'ramda'
+import * as atm from '../'
+
 var debuglog = util.debuglog('bob');
-var immutable = require('immutable')
-var R = require('ramda')
-var atm = require('../')
 var ipfs = atm.IPFSClient(atm.util.ipfsEndpoint())
 
-var peerlist = immutable.Set()
+var peerlist = new Set()
 
 function fetchPeers() {
   // TODO: build peerlist using DHT query. For now, just hard-coded:
@@ -13,14 +16,14 @@ function fetchPeers() {
   return Promise.resolve(peerlist)
 }
 
-exports.run = function () {
+export default function () {
   // TODO: Wear badge
   fetchPeers().then(function () {
     return ipfs.nameResolve(peerlist.first())
   }).then(function (resolvedKey) {
     return ipfs.objectGet(resolvedKey + '/allthemusic/contents')
   }).then(function (thisPeersContents) {
-    return immutable.Set().union(R.pluck('Hash', thisPeersContents.Links))
+    return new Set().union(R.pluck('Hash', thisPeersContents.Links))
   }).then(function (contents) {
     debuglog('contents =', contents)
 

@@ -1,2 +1,6 @@
 #!/usr/bin/env node
-require('../demos/alice').run()
+
+'use strict'
+
+import demo from '../demos/alice'
+demo()

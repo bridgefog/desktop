@@ -1,8 +1,12 @@
-var util = require('util')
+'use strict'
+
+import util from 'util'
+import * as atm from '../'
+
 var debuglog = util.debuglog('alice');
-var atm = require('../')
 var ipfs = atm.IPFSClient(atm.util.ipfsEndpoint())
-var DagObject = atm.DagObject
+var DagObject = atm.dag.DagObject
+var clubnet = new atm.Clubnet(ipfs, () => new atm.Badge())
 
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
@@ -26,7 +30,7 @@ function inventSomeSongs() {
 
 function addSongMetadataNode(metadata) {
   var obj = new DagObject({ data: JSON.stringify(metadata) })
-  debuglog(obj.asJSONforAPI().toString('utf-8'))
+  debuglog(JSON.stringify(obj.asJSONforAPI()))
   return ipfs.addObject(obj)
 }
 
@@ -39,33 +43,24 @@ function addSomeSongs(songs) {
 }
 
 function addDirectoryTree(contents) {
-  debuglog(contents)
   var contentsNode = new DagObject()
   for (var i = 0; i < contents.length; i++) {
     contentsNode = contentsNode.addLink('', contents[i])
   }
   return ipfs.addObject(contentsNode).then(function (contentsNode) {
-    var atmNode = new DagObject().addLink('contents', contentsNode)
-    return ipfs.addObject(atmNode)
+    return ipfs.addObject(new DagObject().addLink('contents', contentsNode))
   }).then(function (atmNode) {
-    var directoryNode = new DagObject().addLink('allthemusic', atmNode)
-    return ipfs.addObject(directoryNode)
+    return ipfs.addObject(new DagObject().addLink('allthemusic', atmNode))
   })
 }
 
-exports.run = function () {
-  // TODO: Wear badge
-  addSomeSongs(inventSomeSongs()).then(function (objects) {
-    debuglog(objects)
-    return addDirectoryTree(objects)
-  }).then(function (directoryNode) {
-    return ipfs.namePublish(directoryNode).then(function () {
-      console.log('Published key ' + directoryNode)
+export default function () {
+  clubnet.wearBadge().
+    then(() => addSomeSongs(inventSomeSongs())).
+    then(objects => addDirectoryTree(objects)).
+    then(directoryNode => ipfs.namePublish(directoryNode)).
+    catch((reason) => {
+      debuglog('FAILED', reason)
+      if (reason instanceof Error) { console.log(reason.stack) }
     })
-  }).catch(function (reason) {
-    debuglog('FAILED', reason)
-    if (reason instanceof Error) {
-      console.log(reason.stack)
-    }
-  })
 }
