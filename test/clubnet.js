@@ -1,9 +1,9 @@
 'use strict'
 
-var sinon = require('sinon')
-var assert = require('chai').assert
-var _clubnet = require('../lib/clubnet')
-var Badge = require('../lib/badge')
+import sinon from 'sinon'
+import { assert } from 'chai'
+import Clubnet from '../lib/clubnet'
+import Badge from '../lib/badge'
 
 describe('Clubnet', function () {
   var peerlist = ['peer_1', 'peer_2']
@@ -11,14 +11,13 @@ describe('Clubnet', function () {
     objectPut: sinon.stub().returns(Promise.resolve('thisisthehash')),
     dhtFindprovs: sinon.stub().returns(Promise.resolve(peerlist)),
   }
-  var clubnet = _clubnet(ipfs)
   var now = Date.now()
+  var clubnet = new Clubnet(ipfs, () => new Badge(now))
 
   describe('wearBadge()', function () {
-    var badge
     before(function () {
-      badge = new Badge(null, now)
-      return clubnet.wearBadge(badge)
+      clubnet.badge = clubnet.buildBadge()
+      return clubnet.wearBadge()
     })
 
     it('adds the badge\'s dagObject to IPFS', function () {
@@ -26,24 +25,17 @@ describe('Clubnet', function () {
     })
 
     it('adds the IPFS objectPut hash to the badge\' hash', function () {
-      assert.equal(badge.hash(), 'thisisthehash')
+      assert.equal(clubnet.badge.hash(), 'thisisthehash')
     })
   })
 
   describe('findPeers()', function () {
-    var badge
-    before(function () {
-      badge = new Badge(null, now)
-    })
-
     it('returns the list of peers with the badge', function () {
-      return clubnet.findPeers(badge).then(function (peers) {
-        assert.deepEqual(peers, peerlist)
-      })
+      return clubnet.findPeers().then((peers) => assert.deepEqual(peers, peerlist))
     })
 
     it('adds the IPFS objectPut hash to the badge\' hash', function () {
-      assert.equal(badge.hash(), 'thisisthehash')
+      assert.equal(clubnet.badge.hash(), 'thisisthehash')
     })
   })
 })
