@@ -1,7 +1,7 @@
 'use strict'
 
-var assert = require('chai').assert
-var Badge = require('../lib/badge')
+import { assert } from 'chai'
+import Badge from '../lib/badge'
 
 describe('Badge', function () {
   var now = Date.now()

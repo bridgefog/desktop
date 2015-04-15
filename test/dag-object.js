@@ -1,8 +1,8 @@
 'use strict'
 
-var DagObject = require('../lib/dag-object')
-var assert = require('chai').assert
-var immutable = require('immutable')
+import { assert } from 'chai'
+import { Set } from 'immutable'
+import { DagObject, DagLink } from '../lib/dag-object'
 
 describe('DagObject', function () {
   describe('constructor', function () {
@@ -16,7 +16,7 @@ describe('DagObject', function () {
 
     context('with just links', function () {
       it('has links but no data', function () {
-        var node = new DagObject({ links: immutable.Set([1, 2, 3]) })
+        var node = new DagObject({ links: new Set([1, 2, 3]) })
         assert.equal(node.data, null)
         assert.equal(node.links.size, 3)
         assert.deepEqual(node.links.toJS(), [1, 2, 3])
@@ -49,8 +49,8 @@ describe('DagObject', function () {
       node = node.addLink('name2', 'hash2')
       assert.equal(node.links.size, 2)
       assert.deepEqual(node.links.toJS(), [
-        new DagObject.DagLink('name1', 'hash1', 0),
-        new DagObject.DagLink('name2', 'hash2', 0),
+        new DagLink('name1', 'hash1', 0),
+        new DagLink('name2', 'hash2', 0),
       ])
     })
   })

@@ -1,8 +1,8 @@
 'use strict'
 
-var url = require('url')
-var R = require('ramda')
-var Stubby = require('stubby').Stubby
+import url from 'url'
+import R from 'ramda'
+import { Stubby } from 'stubby'
 
 var mockIpfsEndpoint = url.parse('http://localhost:48130')
 

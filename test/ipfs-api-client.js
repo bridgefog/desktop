@@ -1,11 +1,12 @@
 'use strict'
 
-var R = require('ramda')
-var assert = require('chai').assert
-var mockIpfs = require('./mock-ipfs')
-var ipfs = require('../lib/ipfs-api-client')(mockIpfs.endpoint)
-var DagObject = require('../lib/dag-object')
-var p = require('../lib/util').p
+import R from 'ramda'
+import { assert } from 'chai'
+import mockIpfs from './mock-ipfs'
+import ipfsClient from '../lib/ipfs-api-client'
+import { DagObject } from '../lib/dag-object'
+
+var ipfs = ipfsClient(mockIpfs.endpoint)
 
 var knownHashes = {
   foo: 'QmWqEeZS1HELySbm8t8U55UkBe75kaLj9WnFb882Tkf5NL'

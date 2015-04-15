@@ -1,4 +1,4 @@
-var Base = require('mocha/lib/reporters/base')
+import Base from 'mocha/lib/reporters/base'
 
 module.exports = function (runner) {
   Base.call(this, runner)

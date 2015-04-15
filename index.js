@@ -1,9 +1,9 @@
 'use strict'
 
-module.exports = {
-  DagObject: require('./lib/dag-object'),
-  IPFSClient: require('./lib/ipfs-api-client'),
-  util: require('./lib/util'),
-  Badge: require('./lib/badge'),
-  Clubnet: require('./lib/clubnet'),
-}
+import DagObject from './lib/dag-object'
+import IPFSClient from './lib/ipfs-api-client'
+import util from './lib/util'
+import Badge from './lib/badge'
+import Clubnet from './lib/clubnet'
+
+export { DagObject, IPFSClient, Badge, Clubnet, util }
