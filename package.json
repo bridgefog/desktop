@@ -16,9 +16,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "core-js": "^0.8.4",
     "form-data": "0.2.0",
-    "ramda": "^0.13.0",
-    "immutable": "^3.6.4"
+    "immutable": "^3.6.4",
+    "ramda": "^0.13.0"
   },
   "devDependencies": {
     "babel": "^5.0.8",
