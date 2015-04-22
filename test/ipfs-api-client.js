@@ -3,10 +3,10 @@
 import R from 'ramda'
 import { assert } from 'chai'
 import mockIpfs from './mock-ipfs'
-import ipfsClient from '../lib/ipfs-api-client'
+import IPFSClient from '../lib/ipfs-api-client'
 import { DagObject } from '../lib/dag-object'
 
-var ipfs = ipfsClient(mockIpfs.endpoint)
+var ipfs = new IPFSClient(mockIpfs.endpoint)
 
 var knownHashes = {
   foo: 'QmWqEeZS1HELySbm8t8U55UkBe75kaLj9WnFb882Tkf5NL'
@@ -29,7 +29,7 @@ describe('IPFS API', function () {
           body: { ID: 'this_is_my_peerid' },
         },
       }])
-      .then(ipfs.peerID)
+      .then(() => ipfs.peerID())
       .then(result => assert.equal(result, 'this_is_my_peerid'))
     })
   })
