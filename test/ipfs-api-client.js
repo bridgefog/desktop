@@ -91,6 +91,30 @@ describe('IPFS API', function () {
     })
   })
 
+  describe('objectGet', function () {
+    it('retrieves the dag object described by the given hash', function () {
+      var dagNode = new DagObject({ data: 'foo' })
+
+      // TODO: Ensure the body of the request looks right
+      return mockIpfs.mock([{
+        request: {
+          url: '/api/v0/object/get',
+          query: { arg: 'QmMutiHash' },
+          method: 'GET',
+        },
+        response: {
+          headers: { 'content-type': 'application/json' },
+          body: dagNode.asJSONforAPI(),
+        },
+      }])
+      .then(() => ipfs.objectGet('QmMutiHash'))
+      .then(result => assert.deepEqual(result, {
+        Links: [],
+        Data: 'foo',
+      }))
+    })
+  })
+
   describe('objectPut', function () {
     it('returns a thing with the correct Hash', function () {
       var dagNode = new DagObject({ data: 'foo' })
