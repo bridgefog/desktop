@@ -4,7 +4,9 @@ var buffer = require('vinyl-buffer')
 var gulp = require('gulp')
 var gutil = require('gulp-util')
 var jscs = require('gulp-jscs')
-var jshint = require('gulp-jshint')
+var jshint = require('jshint')
+var gulpJshint = require('gulp-jshint')
+var jshintStylish = require('jshint-stylish')
 var mocha = require('gulp-mocha')
 var source = require('vinyl-source-stream')
 var sourcemaps = require('gulp-sourcemaps')
@@ -47,8 +49,8 @@ gulp.task('jscs', function () {
 
 gulp.task('jshint', function () {
   return gulp.src(globs.javascripts + globs.package_json + globs.rc_files)
-    .pipe(jshint())
-    .pipe(jshint.reporter('jshint-stylish'))
+    .pipe(gulpJshint({ linter: jshint.JSHINT }))
+    .pipe(gulpJshint.reporter(jshintStylish))
 })
 
 gulp.task('lint', ['jscs', 'jshint'])
