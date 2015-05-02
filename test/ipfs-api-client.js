@@ -1,11 +1,15 @@
 'use strict'
 
 import R from 'ramda'
-import { assert } from 'chai'
+import { default as chai, assert } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 import mockIpfs from './mock-ipfs'
-import IPFSClient from '../lib/ipfs-api-client'
+import { default as IPFSClient, minimumIPFSVersion } from '../lib/ipfs-api-client'
 import { DagObject } from '../lib/dag-object'
 import { concatP } from '../lib/util'
+import Version from '../lib/version'
+
+chai.use(chaiAsPromised)
 
 var ipfs = new IPFSClient(mockIpfs.endpoint)
 
@@ -16,6 +20,58 @@ var knownHashes = {
 describe('IPFS API', function () {
   afterEach(function () {
     return mockIpfs.reset()
+  })
+
+  describe('assertVersionCompatible', function () {
+    var versionString
+
+    beforeEach(function () {
+      return mockIpfs.mock([{
+        request: {
+          url: '/api/v0/version',
+          method: 'GET',
+        },
+        response: {
+          headers: { 'content-type': 'application/json' },
+          body: { Version: versionString },
+        },
+      }])
+    })
+
+    context('when the version is >= the min compatible version', function () {
+      before(() => versionString = minimumIPFSVersion.toString())
+
+      it('returns the version', function () {
+        var expectedResult = new Version(0, 3, 3)
+        return ipfs.assertVersionCompatible().then(result => assert.deepEqual(result, expectedResult))
+      })
+    })
+
+    context('when the version is < the min compatible version', function () {
+      before(() => versionString = '0.1.1')
+
+      it('rejects with an error', function () {
+        return assert.isRejected(ipfs.assertVersionCompatible(), /need version .+ but connected to 0.1.1/)
+      })
+    })
+  })
+
+  describe('version', function () {
+    it('returns the IPFS version of this local node', function () {
+      var expectedResult = new Version(0, 3, 3)
+      return mockIpfs.mock([{
+        request: {
+          url: '/api/v0/version',
+          method: 'GET',
+        },
+        response: {
+          headers: { 'content-type': 'application/json' },
+          body: { Version: '0.3.3' },
+        },
+      }])
+      .then(() => ipfs.version())
+      .then(result => assert.deepEqual(result, expectedResult))
+    })
   })
 
   describe('peerID', function () {
@@ -93,11 +149,11 @@ describe('IPFS API', function () {
           },
           response: {
             headers: { 'content-type': 'application/json' },
-            body: { Key: knownHashes.foo },
+            body: { Path: '/ipfs/' + knownHashes.foo },
           },
         }])
         .then(() => ipfs.nameResolve(peerId))
-        .then((hash) => assert.equal(hash, knownHashes.foo))
+        .then((path) => assert.equal(path, '/ipfs/' + knownHashes.foo))
       })
     })
   })

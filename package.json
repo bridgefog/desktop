@@ -30,6 +30,7 @@
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
     "chai": "^2.1.2",
+    "chai-as-promised": "^5.0.0",
     "gulp": "^3.8.11",
     "gulp-jscs": "*",
     "gulp-jshint": "^1.9.4",
