@@ -5,6 +5,7 @@ import { assert } from 'chai'
 import mockIpfs from './mock-ipfs'
 import IPFSClient from '../lib/ipfs-api-client'
 import { DagObject } from '../lib/dag-object'
+import { concatP } from '../lib/util'
 
 var ipfs = new IPFSClient(mockIpfs.endpoint)
 
@@ -104,7 +105,7 @@ describe('IPFS API', function () {
   describe('dhtFindprovs', function () {
     context('the given contentID', function () {
       // FIXME: Make this stub return chunked response correctly
-      it.skip('returns array of peerIds who have contentID', function () {
+      it('returns array of peerIds who have contentID', function () {
         var contentID = 'this_is_content_id'
 
         var responseChunks = []
@@ -125,6 +126,12 @@ describe('IPFS API', function () {
           ],
           Type: 4,
         })
+        responseChunks.push({
+          Extra: 'routing: not found',
+          ID: '',
+          Responses: null,
+          Type: 3,
+        })
 
         var buildMultiChunkBody = R.compose(R.reduce((a, b) => a + b, ''), R.map(JSON.stringify))
 
@@ -139,6 +146,8 @@ describe('IPFS API', function () {
           },
         }])
         .then(() => ipfs.dhtFindprovs(contentID))
+        .then(concatP)
+        .then(R.pluck('ID'))
         .then((peerIDs) => assert.deepEqual(peerIDs, ['peer_id_1', 'peer_id_2', 'peer_id_3']))
       })
     })

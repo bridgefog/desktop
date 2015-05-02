@@ -9,6 +9,7 @@ var mocha = require('gulp-mocha')
 var source = require('vinyl-source-stream')
 var sourcemaps = require('gulp-sourcemaps')
 var watchify = require('watchify')
+
 require('babel/register')
 var mochaReporter = require('./test/support/gulp-mocha-reporter')
 var ipfsMock = require('./test/mock-ipfs')
