@@ -53,7 +53,7 @@ function addDirectoryTree(contents) {
 }
 
 export default function () {
-  clubnet.wearBadge()
+  return clubnet.wearBadge()
     .then(() => addSomeSongs(inventSomeSongs()))
     .then(objects => addDirectoryTree(objects))
     .then(directoryNode => ipfs.namePublish(directoryNode))
