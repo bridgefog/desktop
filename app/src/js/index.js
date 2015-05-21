@@ -5,28 +5,24 @@ process.env.NODE_DEBUG = 'ipfs'
 import util from 'util'
 import { Set } from 'immutable'
 import react from 'react'
-import { Dispatcher } from 'flux'
 import R from 'ramda'
-import $ from 'jquery'
 import { IPFSClient, Clubnet, Badge } from 'atm-common'
+import peerActions from './actions/peers'
+import trackActions from './actions/tracks'
+import { Track } from './stores/tracks'
+import { Peer } from './stores/peers'
+import Peerlist from './components/peerlist'
+import Tracklist from './components/tracklist'
 
-var songlist = new Set()
 var publishedKeys = new Set()
-
-var dispatcher = new Dispatcher()
 
 function handleError(reason) {
   console.log('FAILED', reason)
   if (reason instanceof Error) { console.log(reason.stack) }
-  var newEl = $('<p class="error"><code>' + reason.toString() + '</code></p>')
-  $('#log').append(newEl).show()
-  newEl[0].scrollIntoView()
 }
 
 function log() {
-  var newEl = $('<p class="info"><code>' + util.format.apply(util, arguments) + '</code></p>')
-  $('#log').append(newEl).show()
-  newEl[0].scrollIntoView()
+  console.log(util.format.apply(util, arguments))
 }
 
 function getPeers() {
@@ -42,12 +38,13 @@ function fetchPeersContents(thisPeersContents) {
   var contents = new Set().union(R.pluck('Hash', thisPeersContents.Links))
 
   contents.forEach(key => {
-    if (songlist.has(key)) { return }
     ipfs.objectGet(key)
       .then(object => {
-        songlist = songlist.add(key)
         var metadata = JSON.parse(object.Data)
-        $('#list tbody').append('<tr><td>' + metadata.artist + '</td><td>' + metadata.title + '</td></tr>')
+        metadata.key = key
+        trackActions.add(new Track(metadata))
+        console.log(metadata)
+        // $('#list tbody').append('<tr><td>' + metadata.artist + '</td><td>' + metadata.title + '</td></tr>')
       })
       .catch(handleError)
   })
@@ -67,13 +64,21 @@ clubnet.on('newPeer', peerId => {
 })
 
 clubnet.on('peer', function (peerId) {
+  var p = new Peer({ key: peerId })
+  peerActions.add(p.set('status', 'resolving'))
   ipfs.nameResolve(peerId)
     .then(resolvedKey => {
       if (!publishedKeys.has(resolvedKey)) {
         decoratePeerId(peerId).then(peerId =>
           log('Peer', peerId, 'name resolved to new key', resolvedKey))
         publishedKeys = publishedKeys.add(resolvedKey)
-        return ipfs.objectGet(resolvedKey + '/allthemusic/contents').then(fetchPeersContents)
+
+        peerActions.add(p.set('status', 'getting contents'))
+        var promise = ipfs.objectGet(resolvedKey + '/allthemusic/contents')
+        promise.then(() => {
+          peerActions.add(p)
+        })
+        return promise.then(fetchPeersContents)
       }
     })
     .catch(handleError)
@@ -82,3 +87,13 @@ clubnet.on('peer', function (peerId) {
 getPeers()
 
 global.clubnet = clubnet
+
+react.render(
+  react.createElement(
+    'div', null,
+    react.createElement(Tracklist, null),
+    react.createElement(Peerlist, null)
+  ),
+  document.getElementById('content'))
+
+global.peerActions = peerActions

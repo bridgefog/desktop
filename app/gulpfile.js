@@ -34,6 +34,7 @@ function buildBrowserBundle(bundler) {
   browserSync.notify('Browserify rebuilding...')
   gutil.log('Browserify rebuilding...')
   return bundler.bundle()
+    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
     .pipe(source('index.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({ loadMaps: true })) // loads map from browserify file
