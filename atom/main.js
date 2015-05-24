@@ -1,17 +1,16 @@
 'use strict'
 
 var app = require('app')
-var Menu = require('menu');
-var Tray = require('tray');
-
+var Menu = require('menu')
+var Tray = require('tray')
 var BrowserWindow = require('browser-window')
-
-console.log('process.versions =', process.versions)
-
-var Server = require('atm-app/dev-support/server')
+var crashReporter = require('crash-reporter')
+var ipfsProxy = require('./renderer/dev-support/ipfs-proxy')
 
 // Report crashes to our server.
-require('crash-reporter').start()
+crashReporter.start()
+
+console.log('process.versions =', process.versions)
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the javascript object is GCed.

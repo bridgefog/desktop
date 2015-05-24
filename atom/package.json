@@ -15,9 +15,7 @@
   },
   "homepage": "https://github.com/allthemusic/desktop",
   "devDependencies": {
-    "atom-shell": "^0.22.3"
+    "electron-prebuilt": "^0.26.1"
   },
-  "dependencies": {
-    "atm-app": "../app"
-  }
+  "dependencies": {}
 }
