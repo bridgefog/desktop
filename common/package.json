@@ -44,12 +44,18 @@
     "stream-array": "^1.1.0",
     "stubby": "^0.2.11",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.0.0"
   },
   "config": {
     "ipfs_endpoint": "http://localhost:5001"
   },
   "browser": {
     "./lib/http-post-form.js": "./lib/http-post-form-browser.js"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
   }
 }
