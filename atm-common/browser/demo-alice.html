@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AllTheMusic - Alice Demo</title>
+</head>
+<body>
+  <h1>AllTheMusic</h1>
+  <p>Open your inspector.</p>
+
+  <script type="text/javascript">
+    window.ipfs_endpoint = 'http://api.ipfs.dev:80'
+  </script>
+  <script src="bundle.js" type="text/javascript"></script>
+  <script src="{{entry}}" type="text/javascript"></script>
+
+  <script type='text/javascript'>
+    var demo = require('/demos/alice')
+    demo.run()
+  </script>
+
+</body>
+</html>
