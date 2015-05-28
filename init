@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e -x
+
+pushd app
+./init
+popd
+
+pushd electron
+./init
+popd

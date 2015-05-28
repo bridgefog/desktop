@@ -1,11 +1,12 @@
 'use strict'
 
+var http = require('http')
 var app = require('app')
 var Menu = require('menu')
 var Tray = require('tray')
 var BrowserWindow = require('browser-window')
 var crashReporter = require('crash-reporter')
-var ipfsProxy = require('./renderer/dev-support/ipfs-proxy')
+var ipfsProxy = require('../app/dev-support/ipfs-proxy')
 
 // Report crashes to our server.
 crashReporter.start()
@@ -16,12 +17,15 @@ console.log('process.versions =', process.versions)
 // be closed automatically when the javascript object is GCed.
 var mainWindow = null
 
-var server = new Server({
-  ipfs: {
-    host: 'localhost',
-    gatewayPort: 8080,
-    apiPort: 5001,
-  },
+var ipfsConfig = {
+  host: 'localhost',
+  gatewayPort: 8080,
+  apiPort: 5001,
+}
+var server = http.createServer(ipfsProxy(ipfsConfig))
+var serverPort = 3409
+server.listen(serverPort, '127.0.0.1', function() {
+  console.log(arguments)
 })
 
 var appIcon = null;
@@ -40,7 +44,7 @@ app.on('ready', function () {
   mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
   // and load the index.html of the app.
-  mainWindow.loadUrl('http://localhost:' + server.config.port + '/index.html')
+  mainWindow.loadUrl('http://localhost:' + serverPort + '/index.html')
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
