@@ -9,3 +9,7 @@ popd
 pushd electron
 ./init
 popd
+
+pushd common
+./init
+popd

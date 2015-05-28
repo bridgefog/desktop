@@ -6,11 +6,10 @@ var source = require('vinyl-source-stream')
 var sourcemaps = require('gulp-sourcemaps')
 
 var globs = {
-  javascripts: ['./src/js/**/*.js'],
-  css: ['./src/css/**/*.css'],
-  html: ['./src/**/*.html'],
+  javascripts: ['./lib/**/*.js'],
+  html: ['./index.html'],
   package_json: ['package.json'],
-  rc_files: ['.js*rc'],
+  rc_files: ['../.js*rc'],
   tests: ['test/*.js'],
 }
 
@@ -24,8 +23,11 @@ function buildBrowserifyBundler() {
     packageCache: {},
   }
   return browserify(opts)
-    .transform(babelify)
-    .add('./src/js/index.js')
+    .transform(babelify.configure({
+      ignore: false,
+      only: /lib|atm-common/,
+    }))
+    .add('./lib/index.js')
     .on('log', gutil.log)
     .on('error', gutil.log.bind(gutil, 'Browserify Error'))
 }
@@ -53,29 +55,6 @@ gulp.task('watch-js-bundle', function () {
   var bundler = watchify(buildBrowserifyBundler())
   bundler.on('update', function () { buildBrowserBundle(bundler) })
   return buildBrowserBundle(bundler)
-})
-
-gulp.task('css-bundle', function () {
-  var postcss = require('gulp-postcss')
-  var cssnext = require('cssnext')
-  var importcss = require('postcss-import')
-  var logWarnings = require('postcss-log-warnings')
-
-  return gulp.src(globs.css)
-    .pipe(sourcemaps.init())
-    .pipe(postcss([
-      cssnext(),
-      importcss(),
-      logWarnings(),
-    ]))
-    .on('error', gutil.log.bind(gutil, 'PostCSS Error'))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('./dist/css/'))
-    .pipe(browserSync.reload({ stream: true }))
-})
-
-gulp.task('watch-css-bundle', ['css-bundle'], function () {
-  return gulp.watch(globs.css, ['css-bundle'])
 })
 
 gulp.task('html-bundle', function () {
@@ -119,7 +98,6 @@ gulp.task('browser-sync-server', function () {
 gulp.task('dev-server', [
   'browser-sync-server',
   'watch-js-bundle',
-  'watch-css-bundle',
   'watch-html-bundle',
 ])
 
@@ -139,7 +117,7 @@ gulp.task('watch-lint', ['lint'], function () {
 
 gulp.task('test', ['lint'])
 
-gulp.task('dist', ['js-bundle', 'css-bundle', 'html-bundle'])
+gulp.task('dist', ['js-bundle', 'html-bundle'])
 
 gulp.task('default', [
   'watch-lint',

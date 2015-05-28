@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if [[ -z $ipfs_endpoint && -n $IPFS_PORT_5001_TCP ]]; then
-  export ipfs_endpoint="http://${IPFS_PORT_5001_TCP#tcp://}"
-fi
-
-exec $@

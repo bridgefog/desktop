@@ -3,7 +3,7 @@
 import EventEmitter from 'events'
 import { Set } from 'immutable'
 import mapStream from 'through2-map'
-import { concatP, pl } from './util'
+import { concatP } from './util'
 
 export default class Clubnet extends EventEmitter {
   constructor(ipfsClient, badgeBuilderFunc) {
