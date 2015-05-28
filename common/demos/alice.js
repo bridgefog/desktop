@@ -1,5 +1,6 @@
 'use strict'
 
+import os from 'os'
 import { format, debuglog as newDebuglog } from 'util'
 import { IPFSClient, dag, Clubnet, Badge, util as u } from '../'
 
@@ -14,7 +15,7 @@ function randomInt(low, high) {
 
 function inventMetadataNode() {
   return {
-    artist: format('Artist %d', randomInt(0, 100)),
+    artist: format('%s %d', os.hostname(), randomInt(0, 100)),
     title: format('My song %d', randomInt(0, 100)),
   }
 }
