@@ -4,6 +4,7 @@ var gulp = require('gulp')
 var gutil = require('gulp-util')
 var source = require('vinyl-source-stream')
 var sourcemaps = require('gulp-sourcemaps')
+var react = require('gulp-react')
 
 var globs = {
   javascripts: ['./lib/**/*.js'],
@@ -40,6 +41,7 @@ function buildBrowserBundle(bundler) {
     .pipe(source('index.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({ loadMaps: true })) // loads map from browserify file
+    .pipe(react())
     .pipe(sourcemaps.write('./')) // writes .map file
     .pipe(gulp.dest('./dist/js/'))
     .pipe(browserSync.reload({ stream: true }))

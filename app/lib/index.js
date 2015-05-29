@@ -88,12 +88,17 @@ getPeers()
 
 global.clubnet = clubnet
 
+var divStyle = {
+  margin: '5',
+  padding: '5'
+}
+
 react.render(
-  react.createElement(
-    'div', null,
-    react.createElement(Tracklist, null),
-    react.createElement(Peerlist, null)
-  ),
-  document.getElementById('content'))
+  <div style={divStyle}>
+    <Tracklist />
+    <Peerlist />
+  </div>
+  document.getElementById('content')
+)
 
 global.peerActions = peerActions
