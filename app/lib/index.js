@@ -4,7 +4,7 @@ process.env.NODE_DEBUG = 'ipfs'
 
 import util from 'util'
 import { Set } from 'immutable'
-import react from 'react'
+import React from 'react'
 import R from 'ramda'
 import { IPFSClient, Clubnet, Badge } from 'atm-common'
 import peerActions from './actions/peers'
@@ -88,17 +88,23 @@ getPeers()
 
 global.clubnet = clubnet
 
-var divStyle = {
-  margin: '5',
-  padding: '5'
-}
 
-react.render(
-  <div style={divStyle}>
-    <Tracklist />
-    <Peerlist />
-  </div>
-  document.getElementById('content')
-)
+var Content = React.createClass({
+  render: function () {
+    var style = {
+      border: '5px solid black',
+      margin: '1em',
+      padding: '1em'
+    }
+    return (
+      <div style={style}>
+        <Tracklist />
+        <Peerlist />
+      </div>
+    )
+  }
+})
+
+React.render(<Content />, document.getElementById('content'))
 
 global.peerActions = peerActions
