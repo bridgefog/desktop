@@ -11,18 +11,18 @@
     "url": "https://github.com/allthemusic/desktop.git"
   },
   "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/allthemusic/desktop/issues"
   },
   "homepage": "https://github.com/allthemusic/desktop",
   "devDependencies": {
-    "electron-prebuilt": "^0.26.1",
     "babel": "^5.0.8",
     "babelify": "^5.0.4",
     "browser-sync": "^2.5.3",
     "browserify": "^9.0.3",
     "cssnext": "^1.4.0",
+    "electron-prebuilt": "^0.26.1",
+    "esprima-fb": "^15001.1.0-dev-harmony-fb",
     "gulp": "^3.8.11",
     "gulp-jscs": "*",
     "gulp-jshint": "^1.9.4",

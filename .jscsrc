@@ -38,6 +38,7 @@
   "disallowTrailingWhitespace": true,
   "disallowYodaConditions": true,
   "esnext": true,
+  "esprima": "esprima-fb",
   "maximumLineLength": {
     "allowUrlComments": true,
     "value": 120
