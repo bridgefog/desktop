@@ -1,29 +1,29 @@
-# ATM HTML/JS application
+# ATM Desktop app
 
-This is the client-side HTML/JS application which targets multiple browsers.
-Presently, development focuses on supporting running within [Electron][], but
-ultimately we'd like to maintain support for most modern browsers.
+This is an [Electron][]-based desktop app for AllTheMusic
 
 ## Development
 
-1. See [`../README.md`][parent-readme] first
-2. Run `make init`
+```shell
+source env.sh
+make init
+gulp
+# hack
+```
+### atm-ipfs-api
 
-### atm-common
-
-The [atm-common][] package contains a large amount of the logic needed by this
+The [atm-ipfs-api][] package contains a large amount of the logic needed by this
 app. It's currently under very active development, so we recommend cloning and symlinking
 your local copy into this package, for the time being. We hope to firm up the
 API's soon so we can start merely referencing a semver-style version, but until
 then:
 
-1. Clone [atm-common][]
-2. In the `atm-common` directory
+1. Clone [atm-ipfs-api][]
+2. In the `ipfs-api` directory
     1. follow init instructions there
     2. run `npm link` [(see more about npm-link here)][npm-link]
-3. In this directory, run `npm link atm-common`
+3. In this directory, run `npm link atm-ipfs-api`
 
 [electron]: https://github.com/atom/electron
-[parent-readme]: ../README.md
-[atm-common]: https://github.com/allthemusic/atm-common
+[atm-ifps-api]: https://github.com/allthemusic/atm-ipfs-api
 [npm-link]: https://docs.npmjs.com/cli/link
