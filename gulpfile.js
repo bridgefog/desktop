@@ -8,55 +8,16 @@ var react = require('gulp-react')
 
 var globs = {
   javascripts: ['./lib/**/*.js'],
-  html: ['./index.html'],
   package_json: ['./package.json'],
+  html: ['./static/*.html'],
   rc_files: ['./.js*rc'],
   tests: ['./test/*.js'],
 }
 
-function buildBrowserifyBundler() {
-  var browserify = require('browserify')
-  var babelify = require('babelify')
-
-  var opts = {
-    debug: true,
-    cache: {},
-    packageCache: {},
-  }
-  return browserify(opts)
-    .transform(babelify.configure({
-      ignore: false,
-      only: /lib|atm-ipfs-api/,
-    }))
-    .add('./lib/index.js')
-    .on('log', gutil.log)
-    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-}
-
-function buildBrowserBundle(bundler) {
-  browserSync.notify('Browserify rebuilding...')
-  gutil.log('Browserify rebuilding...')
-  return bundler.bundle()
-    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-    .pipe(source('index.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({ loadMaps: true })) // loads map from browserify file
-    .pipe(react())
-    .pipe(sourcemaps.write('./')) // writes .map file
-    .pipe(gulp.dest('./dist/js/'))
-    .pipe(browserSync.reload({ stream: true }))
-}
-
 gulp.task('js-bundle', function () {
-  return buildBrowserBundle(buildBrowserifyBundler())
 })
 
 gulp.task('watch-js-bundle', function () {
-  var watchify = require('watchify')
-
-  var bundler = watchify(buildBrowserifyBundler())
-  bundler.on('update', function () { buildBrowserBundle(bundler) })
-  return buildBrowserBundle(bundler)
 })
 
 gulp.task('html-bundle', function () {
@@ -85,14 +46,10 @@ gulp.task('jshint', function () {
 })
 
 gulp.task('browser-sync-server', function () {
-  var ipfsProxy = require('./dev-support/ipfs-proxy')
   return browserSync({
     open: false,
     server: {
       baseDir: './dist',
-      middleware: [
-        ipfsProxy({ host: 'localhost', gatewayPort: 8080, apiPort: 5001 })
-      ],
     },
   })
 })

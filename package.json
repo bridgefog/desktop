@@ -35,8 +35,10 @@
     "jscs": "^1.11.3",
     "jshint": "^2.6.3",
     "jshint-stylish": "^1.0.1",
+    "node-libs-browser": "^0.5.2",
     "postcss-import": "^5.2.2",
     "postcss-log-warnings": "^0.2.0",
+    "through2-map": "^1.4.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.0.0"
