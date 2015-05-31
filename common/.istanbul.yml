@@ -1,4 +1,0 @@
----
-instrumentation:
-  excludes:
-    - gulpfile.js

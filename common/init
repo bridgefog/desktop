@@ -1,6 +1,0 @@
-#!/bin/bash
-
-set -e -x
-
-npm prune
-npm update

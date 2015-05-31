@@ -9,9 +9,9 @@ var react = require('gulp-react')
 var globs = {
   javascripts: ['./lib/**/*.js'],
   html: ['./index.html'],
-  package_json: ['package.json'],
-  rc_files: ['../.js*rc'],
-  tests: ['test/*.js'],
+  package_json: ['./package.json'],
+  rc_files: ['./.js*rc'],
+  tests: ['./test/*.js'],
 }
 
 function buildBrowserifyBundler() {
@@ -26,7 +26,7 @@ function buildBrowserifyBundler() {
   return browserify(opts)
     .transform(babelify.configure({
       ignore: false,
-      only: /lib|atm-common/,
+      only: /lib|atm-ipfs-api/,
     }))
     .add('./lib/index.js')
     .on('log', gutil.log)

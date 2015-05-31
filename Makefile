@@ -2,5 +2,9 @@
 
 all: init
 
-init:
-	./init
+test: init
+	npm test
+
+init: node_modules
+	npm prune
+	npm update
