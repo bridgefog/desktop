@@ -3,10 +3,10 @@
 import util from 'util'
 import { Set } from 'immutable'
 import R from 'ramda'
-import * as atm from '../'
+import { util as ipfsUtil, IPFSClient } from 'atm-ipfs-util'
 
 var debuglog = util.debuglog('bob');
-var ipfs = atm.IPFSClient(atm.util.ipfsEndpoint())
+var ipfs = new IPFSClient(ipfsUtil.ipfsEndpoint())
 
 var peerlist = new Set()
 

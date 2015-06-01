@@ -2,7 +2,9 @@
 
 import os from 'os'
 import { format, debuglog as newDebuglog } from 'util'
-import { IPFSClient, dag, Clubnet, Badge, util as u } from '../'
+import { IPFSClient, dag, util as u } from 'atm-ipfs-api'
+import Clubnet from '../lib/clubnet'
+import Badge from '../lib/badge'
 
 var debuglog = newDebuglog('alice')
 var ipfs = new IPFSClient(u.ipfsEndpoint())
