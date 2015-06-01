@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+'use strict'
+
+var atmIpfsApi = require('atm-ipfs-api')
+
+var id3 = require('id3_reader')
+
+var filename = process.argv[2]
+console.log('Reading ', filename)
+
+id3.read(filename, function (err, data) {
+  if (err) {
+    console.log('ERROR', err)
+  }
+  if (data.attached_picture) {
+    data.attached_picture = true
+  }
+  console.log(data)
+})
