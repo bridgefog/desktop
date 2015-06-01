@@ -1,6 +1,7 @@
 
 'use strict'
 import os from 'os'
+import fs from 'fs'
 import { format, debuglog as newDebuglog } from 'util'
 import { IPFSClient, DagObject, util as u } from 'atm-ipfs-api'
 import Clubnet from '../lib/clubnet'
@@ -9,40 +10,6 @@ import Badge from '../lib/badge'
 var debuglog = newDebuglog('alice')
 var ipfs = new IPFSClient(u.ipfsEndpoint())
 var clubnet = new Clubnet(ipfs, () => new Badge())
-
-function randomInt(low, high) {
-  return Math.floor(Math.random() * (high - low) + low);
-}
-
-function inventMetadataNode() {
-  return {
-    artist: format('%s %d', os.hostname(), randomInt(0, 100)),
-    title: format('My song %d', randomInt(0, 100)),
-  }
-}
-
-function inventSomeSongs() {
-  var songs = []
-  for (var i = 0; i <= 10; i++) {
-    songs[i] = inventMetadataNode()
-    debuglog('songs[%d] =', i, songs[i])
-  }
-  return songs
-}
-
-function addSongMetadataNode(metadata) {
-  var obj = new DagObject({ data: JSON.stringify(metadata) })
-  debuglog(JSON.stringify(obj.asJSONforAPI()))
-  return ipfs.objectPut(obj)
-}
-
-function addSomeSongs(songs) {
-  var addRequests = []
-  for (var i = 0; i < songs.length; i++) {
-    addRequests[i] = addSongMetadataNode(songs[i])
-  }
-  return Promise.all(addRequests)
-}
 
 function addDirectoryTree(contents) {
   var contentsNode = new DagObject()
@@ -54,10 +21,19 @@ function addDirectoryTree(contents) {
     .then(atmNodeHash => ipfs.objectPut(new DagObject().addLink('allthemusic', atmNodeHash)))
 }
 
+function readContentsFile(path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, { encoding: 'utf-8' }, (err, data) => {
+      if (err) { return reject(err) }
+      resolve(data.split(/\n/).slice(0, -1))
+    })
+  })
+}
+
 export default function () {
   return clubnet.wearBadge()
-    .then(() => addSomeSongs(inventSomeSongs()))
-    .then(objects => addDirectoryTree(objects))
+    .then(() => readContentsFile('tmp/contents'))
+    .then(contentsList => addDirectoryTree(contentsList))
     .then(directoryNode => ipfs.namePublish(directoryNode))
     .then(key => console.log('Published', key))
     .catch((reason) => {
