@@ -1,32 +1,41 @@
-var livereload = require('gulp-livereload')
-var gulp = require('gulp')
-var sourcemaps = require('gulp-sourcemaps')
-var gulpReact = require('gulp-react')
-var gulpBabel = require('gulp-babel')
 var electron = require('electron-prebuilt')
-var proc = require('child_process')
+var gulp = require('gulp')
+var gulpBabel = require('gulp-babel')
 var gulpJshint = require('gulp-jshint')
+var gulpReact = require('gulp-react')
 var jscs = require('gulp-jscs')
 var jsxhint = require('jshint-jsx').JSXHINT
+var livereload = require('gulp-livereload')
+var newer = require('gulp-newer')
+var proc = require('child_process')
+var sourcemaps = require('gulp-sourcemaps')
 
 var globs = {
   javascripts: ['./lib/**/*.js'],
   package_json: ['./package.json'],
-  html: ['./static/*.html'],
+  static: ['./static/**/*'],
   rc_files: ['./.js*rc'],
   gulpfile: [__filename],
   tests: ['./test/*.js'],
   dest: ['./dist'],
 }
+globs.jsAndJSONFiles = [].concat(
+  globs.javascripts,
+  globs.tests,
+  globs.gulpfile,
+  globs.rc_files,
+  globs.package_json
+)
 
 gulp.task('js-bundle', function () {
   return gulp.src(globs.javascripts)
+    .pipe(newer(globs.dest[0]))
     .pipe(sourcemaps.init())
     .pipe(gulpBabel())
     .pipe(gulpReact())
     .pipe(sourcemaps.write('.'))
-    .pipe(livereload())
     .pipe(gulp.dest(globs.dest[0]))
+    .pipe(livereload())
 })
 
 gulp.task('watch-js-bundle', function () {
@@ -36,30 +45,24 @@ gulp.task('watch-js-bundle', function () {
   return gulp.watch(globs.javascripts, ['js-bundle'])
 })
 
-gulp.task('html-bundle', function () {
-  return gulp.src(globs.html)
-    .pipe(gulp.dest('./dist/'))
+gulp.task('static-bundle', function () {
+  return gulp.src(globs.static)
+    .pipe(newer(globs.dest[0]))
+    .pipe(gulp.dest(globs.dest[0]))
     .pipe(livereload())
 })
 
-gulp.task('watch-html-bundle', ['html-bundle'], function () {
-  return gulp.watch(globs.html, ['html-bundle'])
+gulp.task('watch-static-bundle', ['static-bundle'], function () {
+  return gulp.watch(globs.static, ['static-bundle'])
 })
 
 gulp.task('jscs', function () {
-  return gulp.src([].concat(globs.javascripts).concat(globs.gulpfile))
+  return gulp.src([].concat(globs.javascripts, globs.tests, globs.gulpfile))
     .pipe(jscs())
 })
 
 gulp.task('jshint', function () {
-  var jsAndJSONFiles = [].concat(
-    globs.javascripts,
-    globs.gulpfile,
-    globs.rc_files,
-    globs.package_json
-  )
-
-  return gulp.src(jsAndJSONFiles)
+  return gulp.src(globs.jsAndJSONFiles)
     .pipe(gulpJshint({ linter: jsxhint }))
 })
 
@@ -79,7 +82,7 @@ gulp.task('default', [
   'livereload',
   'watch-lint',
   'watch-js-bundle',
-  'watch-html-bundle',
+  'watch-static-bundle',
   'electron',
 ])
 
@@ -90,9 +93,9 @@ gulp.task('watch-lint', function () {
   // watch task dependent on success of initial `lint` run
   gulp.start('lint')
 
-  return gulp.watch(globs.javascripts, ['lint'])
+  return gulp.watch(globs.jsAndJSONFiles, ['lint'])
 })
 
 gulp.task('test', ['lint'])
 
-gulp.task('dist', ['js-bundle', 'html-bundle'])
+gulp.task('dist', ['js-bundle', 'static-bundle'])
