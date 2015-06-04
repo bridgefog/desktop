@@ -1,5 +1,5 @@
-
 'use strict'
+
 import os from 'os'
 import fs from 'fs'
 import { format, debuglog as newDebuglog } from 'util'
