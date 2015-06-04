@@ -70,7 +70,7 @@ gulp.task('livereload', function () {
   return livereload.listen({ port: 35729 })
 })
 
-gulp.task('electron', function (done) {
+gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
   var electronProc = proc.spawn(electron, [__dirname])
   electronProc.on('exit', function () {
     done()
