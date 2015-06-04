@@ -7,6 +7,7 @@ var jscs = require('gulp-jscs')
 var jsxhint = require('jshint-jsx').JSXHINT
 var livereload = require('gulp-livereload')
 var newer = require('gulp-newer')
+var plumber = require('gulp-plumber')
 var proc = require('child_process')
 var sourcemaps = require('gulp-sourcemaps')
 
@@ -18,10 +19,12 @@ var globs = {
   gulpfile: [__filename],
   tests: ['./test/*.js'],
   dest: ['./dist'],
+  bin: ['./bin/*'],
 }
 globs.jsAndJSONFiles = [].concat(
   globs.javascripts,
   globs.tests,
+  globs.bin,
   globs.gulpfile,
   globs.rc_files,
   globs.package_json
@@ -29,6 +32,7 @@ globs.jsAndJSONFiles = [].concat(
 
 gulp.task('js-bundle', function () {
   return gulp.src(globs.javascripts)
+    .pipe(plumber(function (err) { console.log('[js-bundle ERROR]', err.stack) }))
     .pipe(newer(globs.dest[0]))
     .pipe(sourcemaps.init())
     .pipe(gulpBabel())
@@ -57,7 +61,7 @@ gulp.task('watch-static-bundle', ['static-bundle'], function () {
 })
 
 gulp.task('jscs', function () {
-  return gulp.src([].concat(globs.javascripts, globs.tests, globs.gulpfile))
+  return gulp.src([].concat(globs.javascripts, globs.tests, globs.bin, globs.gulpfile))
     .pipe(jscs())
 })
 
