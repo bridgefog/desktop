@@ -8,3 +8,4 @@ test: init
 init: node_modules
 	npm prune
 	npm update
+	which fpcalc 2> /dev/null || brew install chromaprint

@@ -4,6 +4,7 @@
 
 import childProcess from 'child_process'
 import fs from 'fs'
+import fpcalc from 'fpcalc'
 import id3 from 'id3_reader'
 import R from 'ramda'
 import { Set } from 'immutable'
@@ -29,6 +30,8 @@ class Track{
     this.tags = tags
     this.image = image
     this.size = 0
+    this.chromaprint = null
+    this.duration = null
     this.ipfs_keys = {
       metadata: null,
       media: null,
@@ -52,6 +55,24 @@ function readMp3(filename) {
   })
 }
 
+function fingerprintFile(filename) {
+  console.time('fingerprinting: ' + filename)
+  return new Promise(function (resolve, reject) {
+    fpcalc(filename, function (err, result) {
+      if (err) { reject(err) }
+      // console.log({
+      //   filename: result.file,
+      //   duration: result.duration,
+      //   fingerprintLength: result.fingerprint.length,
+      //   fingerprint: result.fingerprint,
+      // })
+      resolve(result)
+      console.timeEnd('fingerprinting: ' + filename)
+    })
+  })
+}
+
+
 function getFileSize(filename) {
   return new Promise((resolve, reject) => {
     console.time('stat: ' + filename)
@@ -65,7 +86,7 @@ function getFileSize(filename) {
 
 function ipfsAddFile(filename) {
   return new Promise((resolve, reject) => {
-    console.time('ipfsAddFile: ' + filename)
+    // console.time('ipfsAddFile: ' + filename)
     var output = ''
     var proc = childProcess.spawn('ipfs', ['add', '--quiet', filename], { stdio: ['inherit', 'pipe', 'inherit'] })
     proc.stdout.on('data', data => output += data.toString())
@@ -76,15 +97,23 @@ function ipfsAddFile(filename) {
         console.log('exited ' + code)
         reject()
       }
-      console.timeEnd('ipfsAddFile: ' + filename)
+      // console.timeEnd('ipfsAddFile: ' + filename)
     })
   })
 }
 
 function buildMetadataNode(track) {
-  var obj = new DagObject({ data: JSON.stringify(track.tags) })
+  var metadata = R.merge(track.tags, {
+    fingerprints: {
+      chromaprint: track.chromaprint,
+    },
+    duration: track.duration,
+  })
+  console.log('metadata', track.filename, metadata)
+
+  var obj = new DagObject({ data: JSON.stringify(metadata) })
   obj = obj.addLink('file', track.ipfs_keys.media, track.size)
-  console.log('metadata node', JSON.stringify(obj.asJSONforAPI()))
+  // console.log('metadata node', JSON.stringify(obj.asJSONforAPI()))
   return ipfs.objectPut(obj)
 }
 
@@ -92,21 +121,24 @@ function addOneFile(filename) {
   var addFileP = ipfsAddFile(filename)
   var readTagsP = readMp3(filename)
   var fileSizeP = getFileSize(filename)
+  var fingerprintP = fingerprintFile(filename)
 
-  return Promise.all([readTagsP, addFileP, fileSizeP])
-    .then(([track, mediaNodeHash, size]) => {
-      console.log(track.tags)
-      if (track.image) {
-        console.log('WARN: Track has embedded image asset; ignoring for now')
-      }
+  return Promise.all([readTagsP, addFileP, fileSizeP, fingerprintP])
+    .then(([track, mediaNodeHash, size, fpResult]) => {
+      // console.log(track.tags)
+      // if (track.image) {
+      //   console.log('WARN: Track has embedded image asset; ignoring for now')
+      // }
       track.size = size
       track.ipfs_keys.media = mediaNodeHash
+      track.chromaprint = fpResult.fingerprint
+      track.duration = parseInt(fpResult.duration)
       return track
     })
     .then(track => {
-      console.log('ipfs_keys', track.ipfs_keys)
+      // console.log('ipfs_keys', track.ipfs_keys)
       return buildMetadataNode(track).then(hash => {
-        console.log('added metadata node', hash)
+        // console.log('added metadata node', hash)
         track.ipfs_keys.metadata = hash
         return track
       })
@@ -117,14 +149,14 @@ function addOneFile(filename) {
 }
 
 function addDirectoryTree(contents) {
-  console.time('addDirectoryTree')
+  // console.time('addDirectoryTree')
   var addLink = (contentsNode, key) => contentsNode.addLink('', key)
   var contentsNode = R.reduce(addLink, new DagObject(), contents)
   return ipfs.objectPut(contentsNode)
     .then(contentsNodeHash => ipfs.objectPut(new DagObject().addLink('contents', contentsNodeHash)))
     .then(atmNodeHash => ipfs.objectPut(new DagObject().addLink('allthemusic', atmNodeHash)))
     .then(finalHash => {
-      console.timeEnd('addDirectoryTree')
+      // console.timeEnd('addDirectoryTree')
       return finalHash
     })
 }
@@ -148,24 +180,21 @@ if (filenames.length === 0) {
   console.error('ERROR: Supply one or more *.mp3 filename arguments')
   process.exit(1)
 }
-console.log('filenames =', filenames)
+// console.log('filenames =', filenames)
 
 Promise.all(filenames.map(filename => addOneFile(filename)))
   .then(tracks => {
     if (tracks.length === 0) { return }
-    console.log('\n\nAll Tracks')
+    // console.log('\n\nAll Tracks')
     var newTrackKeys = R.compose(R.pluck('metadata'), R.pluck('ipfs_keys'))(tracks)
-    console.log(newTrackKeys)
+    // console.log(newTrackKeys)
 
     console.log('Republishing...')
     console.time('republishing')
     return clubnet.wearBadge()
       .then(getCurrentContents)
       .then(contents => {
-        console.log('newTrackKeys', newTrackKeys)
-        console.log('current Contents', contents)
         var newContents = new Set(contents).union(newTrackKeys).toJS()
-        console.log('newContents', newContents)
         return addDirectoryTree(newContents)
       })
       .then(newKey => ipfs.namePublish(newKey))
