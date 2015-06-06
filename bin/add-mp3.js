@@ -4,13 +4,19 @@
 
 import childProcess from 'child_process'
 import fs from 'fs'
-import fpcalc from 'fpcalc'
+import { http, https } from 'follow-redirects'
+import fpcalc from '../lib/fpcalc'
+import acoustId from 'acoustid'
+import CoverArt from 'coverart'
 import id3 from 'id3_reader'
+import tmp from 'tmp'
 import R from 'ramda'
 import { Set } from 'immutable'
 import { IPFSClient, DagObject, util as ipfsUtil } from 'atm-ipfs-api'
 import Clubnet from '../lib/clubnet'
 import Badge from '../lib/badge'
+
+const ACOUSTID_APP_TOKEN = 'OomsDyzs'
 
 var filterFilenames = R.filter(name => name.endsWith('.mp3'))
 
@@ -32,9 +38,11 @@ class Track{
     this.size = 0
     this.chromaprint = null
     this.duration = null
+    this.acoustid_track_id = null
     this.ipfs_keys = {
       metadata: null,
       media: null,
+      image: null,
     }
   }
 }
@@ -57,21 +65,71 @@ function readMp3(filename) {
 
 function fingerprintFile(filename) {
   console.time('fingerprinting: ' + filename)
+  return fpcalc(filename).then(r => {
+    console.timeEnd('fingerprinting: ' + filename)
+    return r
+  })
+}
+
+function acoustidLookup(fingerprintResult) {
+  var fp = fingerprintResult
   return new Promise(function (resolve, reject) {
-    fpcalc(filename, function (err, result) {
+    acoustId(fp.fingerprint, fp.duration, { key: ACOUSTID_APP_TOKEN }, function (err, result) {
       if (err) { reject(err) }
-      // console.log({
-      //   filename: result.file,
-      //   duration: result.duration,
-      //   fingerprintLength: result.fingerprint.length,
-      //   fingerprint: result.fingerprint,
-      // })
-      resolve(result)
-      console.timeEnd('fingerprinting: ' + filename)
+      resolve(result ? result[0] : null)
     })
   })
 }
 
+var sortBySources = R.sortBy(R.prop('sources'))
+var flatMapAllReleaseGroups = R.compose(R.flatten, R.reject(R.isNil), R.pluck('releasegroups'))
+var flatMapAllReleases = R.compose(R.flatten, R.reject(R.isNil), R.pluck('releases'))
+var sortByDate = R.sortBy(R.path(['date', 'year']))
+
+var coverart = new CoverArt({
+  userAgent: 'my-awesome-app/0.0.1 ( http://my-awesome-app.com )'
+})
+
+var findFirstReleaseWithCoverart = R.reduce((prom, release) => {
+  return prom.then(prevResult => {
+    if (prevResult) { return prevResult } // shovel a valid response down the chain
+
+    // console.log('CoverArt search for release', release.id)
+    return new Promise((resolve, reject) => {
+      coverart.release(release.id, (err, response) => {
+        if (err && err.statusCode == 404) {
+          // no art for this release, try the next one
+          resolve(false)
+        } else if (err) {
+          console.error(err)
+          reject(err)
+        } else {
+          resolve({ release: release, response: response })
+        }
+      })
+    })
+  })
+})
+
+function getBestGuessCoverArt(acoustidResult) {
+  if (!acoustidResult) { return false }
+  var recs = sortBySources(acoustidResult.recordings)
+  var releasegroups = flatMapAllReleaseGroups(recs)
+  var releases = sortByDate(flatMapAllReleases(releasegroups))
+
+  return findFirstReleaseWithCoverart(Promise.resolve(false), releases)
+    .then(result => {
+      if (result) { return result }
+      throw(new Error('No art could be found'))
+    })
+    .then(getFirstFrontImageFromCoverArt)
+}
+
+function getFirstFrontImageFromCoverArt(coverartResult) {
+  var imageResult = R.find(R.propEq('front', true), coverartResult.response.images)
+  if (!imageResult) { throw new Error('Could not find front image') }
+  return imageResult.image // return just the URL
+}
 
 function getFileSize(filename) {
   return new Promise((resolve, reject) => {
@@ -109,10 +167,11 @@ function buildMetadataNode(track) {
     },
     duration: track.duration,
   })
-  console.log('metadata', track.filename, metadata)
+  // console.log('metadata', track.filename, metadata)
 
   var obj = new DagObject({ data: JSON.stringify(metadata) })
   obj = obj.addLink('file', track.ipfs_keys.media, track.size)
+  obj = obj.addLink('image', track.ipfs_keys.image)
   // console.log('metadata node', JSON.stringify(obj.asJSONforAPI()))
   return ipfs.objectPut(obj)
 }
@@ -122,17 +181,21 @@ function addOneFile(filename) {
   var readTagsP = readMp3(filename)
   var fileSizeP = getFileSize(filename)
   var fingerprintP = fingerprintFile(filename)
+  var acoustidP = fingerprintP.then(acoustidLookup)
+  var coverartP = acoustidP.then(getBestGuessCoverArt).then(downloadFileIntoIpfs)
 
-  return Promise.all([readTagsP, addFileP, fileSizeP, fingerprintP])
-    .then(([track, mediaNodeHash, size, fpResult]) => {
+  return Promise.all([readTagsP, addFileP, fileSizeP, fingerprintP, acoustidP, coverartP])
+    .then(([track, mediaNodeHash, size, fpResult, acoustidTrack, coverartKey]) => {
       // console.log(track.tags)
       // if (track.image) {
       //   console.log('WARN: Track has embedded image asset; ignoring for now')
       // }
       track.size = size
       track.ipfs_keys.media = mediaNodeHash
+      track.ipfs_keys.image = coverartKey
       track.chromaprint = fpResult.fingerprint
       track.duration = parseInt(fpResult.duration)
+      track.acoustid_track_id = acoustidTrack.id
       return track
     })
     .then(track => {
@@ -149,16 +212,13 @@ function addOneFile(filename) {
 }
 
 function addDirectoryTree(contents) {
-  // console.time('addDirectoryTree')
   var addLink = (contentsNode, key) => contentsNode.addLink('', key)
   var contentsNode = R.reduce(addLink, new DagObject(), contents)
   return ipfs.objectPut(contentsNode)
-    .then(contentsNodeHash => ipfs.objectPut(new DagObject().addLink('contents', contentsNodeHash)))
-    .then(atmNodeHash => ipfs.objectPut(new DagObject().addLink('allthemusic', atmNodeHash)))
-    .then(finalHash => {
-      // console.timeEnd('addDirectoryTree')
-      return finalHash
-    })
+    .then(contentsNodeHash =>
+          ipfs.objectPut(new DagObject().addLink('contents', contentsNodeHash)))
+    .then(atmNodeHash =>
+          ipfs.objectPut(new DagObject().addLink('allthemusic', atmNodeHash)))
 }
 
 function getCurrentContents() {
@@ -172,6 +232,23 @@ function getCurrentContents() {
     })
 }
 
+function downloadFileIntoIpfs(url) {
+  var tmpfile = tmp.fileSync()
+  return new Promise((resolve, reject) => {
+    // console.log('downloading', url, 'to', tmpfile.name)
+    var file = fs.createWriteStream(null, { fd: tmpfile.fd });
+    var adapter = url.startsWith('https') ? https : http
+    adapter.get(url, (response) => {
+      if (response.statusCode != 200) {
+        reject(new Error('non-200 response:' + response.statusCode + '\n' + response.body))
+      }
+      response.pipe(file)
+      file.on('finish', () => { file.close(resolve) })
+      file.on('error', reject)
+    })
+  }).then(() => ipfsAddFile(tmpfile.name))
+}
+
 var ipfs = new IPFSClient(ipfsUtil.ipfsEndpoint())
 var clubnet = new Clubnet(ipfs, () => new Badge())
 
@@ -183,11 +260,11 @@ if (filenames.length === 0) {
 // console.log('filenames =', filenames)
 
 Promise.all(filenames.map(filename => addOneFile(filename)))
+  .then(R.reject(R.isNil))
   .then(tracks => {
     if (tracks.length === 0) { return }
-    // console.log('\n\nAll Tracks')
-    var newTrackKeys = R.compose(R.pluck('metadata'), R.pluck('ipfs_keys'))(tracks)
-    // console.log(newTrackKeys)
+    var newTrackKeys = R.map(R.path(['ipfs_keys', 'metadata']), tracks)
+    console.log(newTrackKeys)
 
     console.log('Republishing...')
     console.time('republishing')
