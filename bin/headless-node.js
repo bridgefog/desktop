@@ -115,14 +115,14 @@ function resolvePeer(peerId) {
 }
 
 clubnet.on('newPeer', peerId => {
-  if(peerId == myPeerID) { return }
-  console.log('Found new peer: ', peerId)
+  console.log('Found new peer:', decoratePeerId(peerId))
   resolvePeer(peerId)
+  if(peerId == myPeerID) { return }
   setInterval(resolvePeer, 1 * minute, peerId)
 })
 
 clubnet.on('peer', function (peerId) {
-  console.log('Found peer: ', decoratePeerId(peerId))
+  console.log('Found peer:', decoratePeerId(peerId))
 })
 
 ipfs.peerID()
