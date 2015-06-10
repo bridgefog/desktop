@@ -117,7 +117,7 @@ function resolvePeer(peerId) {
 clubnet.on('newPeer', peerId => {
   console.log('Found new peer:', decoratePeerId(peerId))
   resolvePeer(peerId)
-  if(peerId == myPeerID) { return }
+  if (peerId == myPeerID) { return }
   setInterval(resolvePeer, 1 * minute, peerId)
 })
 
