@@ -212,7 +212,7 @@ function addOneFile(filename) {
 }
 
 function addDirectoryTree(contents) {
-  var addLink = (contentsNode, key) => contentsNode.addLink('', key)
+  var addLink = (contentsNode, key) => contentsNode.addLink(key, key)
   var contentsNode = R.reduce(addLink, new DagObject(), contents)
   return ipfs.objectPut(contentsNode)
     .then(contentsNodeHash =>
