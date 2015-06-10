@@ -101,7 +101,7 @@ var findFirstReleaseWithCoverart = R.reduce((prom, release) => {
           // no art for this release, try the next one
           resolve(false)
         } else if (err) {
-          console.error(err)
+          console.error(err, err.stack)
           reject(err)
         } else {
           resolve({ release: release, response: response })
@@ -112,7 +112,7 @@ var findFirstReleaseWithCoverart = R.reduce((prom, release) => {
 })
 
 function getBestGuessCoverArt(acoustidResult) {
-  if (!acoustidResult) { return false }
+  if (!(acoustidResult && acoustidResult.recordings)) { throw(new Error('No art could be found')) }
   var recs = sortBySources(acoustidResult.recordings)
   var releasegroups = flatMapAllReleaseGroups(recs)
   var releases = sortByDate(flatMapAllReleases(releasegroups))
@@ -144,7 +144,7 @@ function getFileSize(filename) {
 
 function ipfsAddFile(filename) {
   return new Promise((resolve, reject) => {
-    // console.time('ipfsAddFile: ' + filename)
+    console.time('ipfsAddFile: ' + filename)
     var output = ''
     var proc = childProcess.spawn('ipfs', ['add', '--quiet', filename], { stdio: ['inherit', 'pipe', 'inherit'] })
     proc.stdout.on('data', data => output += data.toString())
@@ -155,7 +155,7 @@ function ipfsAddFile(filename) {
         console.log('exited ' + code)
         reject()
       }
-      // console.timeEnd('ipfsAddFile: ' + filename)
+      console.timeEnd('ipfsAddFile: ' + filename)
     })
   })
 }
@@ -167,12 +167,12 @@ function buildMetadataNode(track) {
     },
     duration: track.duration,
   })
-  // console.log('metadata', track.filename, metadata)
+  console.log('metadata', track.filename, metadata)
 
   var obj = new DagObject({ data: JSON.stringify(metadata) })
   obj = obj.addLink('file', track.ipfs_keys.media, track.size)
   obj = obj.addLink('image', track.ipfs_keys.image)
-  // console.log('metadata node', JSON.stringify(obj.asJSONforAPI()))
+  console.log('metadata node', JSON.stringify(obj.asJSONforAPI()))
   return ipfs.objectPut(obj)
 }
 
@@ -186,7 +186,7 @@ function addOneFile(filename) {
 
   return Promise.all([readTagsP, addFileP, fileSizeP, fingerprintP, acoustidP, coverartP])
     .then(([track, mediaNodeHash, size, fpResult, acoustidTrack, coverartKey]) => {
-      // console.log(track.tags)
+      console.log(track.tags)
       // if (track.image) {
       //   console.log('WARN: Track has embedded image asset; ignoring for now')
       // }
@@ -199,15 +199,12 @@ function addOneFile(filename) {
       return track
     })
     .then(track => {
-      // console.log('ipfs_keys', track.ipfs_keys)
+      console.log('ipfs_keys', track.ipfs_keys)
       return buildMetadataNode(track).then(hash => {
         // console.log('added metadata node', hash)
         track.ipfs_keys.metadata = hash
         return track
       })
-    })
-    .catch(err => {
-      console.error('ERROR:', err)
     })
 }
 
@@ -233,9 +230,10 @@ function getCurrentContents() {
 }
 
 function downloadFileIntoIpfs(url) {
+  if (!url) { return false }
   var tmpfile = tmp.fileSync()
   return new Promise((resolve, reject) => {
-    // console.log('downloading', url, 'to', tmpfile.name)
+    console.log('downloading', url, 'to', tmpfile.name)
     var file = fs.createWriteStream(null, { fd: tmpfile.fd });
     var adapter = url.startsWith('https') ? https : http
     adapter.get(url, (response) => {
@@ -260,9 +258,14 @@ if (filenames.length === 0) {
 // console.log('filenames =', filenames)
 
 var trackKeys = []
+var errors = []
 R.reduce(
   (prom, filename) => prom.then(() => {
-    return addOneFile(filename).then(key => trackKeys = trackKeys.concat(key))
+    return addOneFile(filename)
+      .then(key => trackKeys = trackKeys.concat(key))
+      .catch(err => {
+        errors = errors.concat({ filename, err });
+      })
   }),
   Promise.resolve(),
   filenames
@@ -289,4 +292,12 @@ R.reduce(
   })
   .catch(e => {
     console.error('ERROR', e.stack)
+  }).then(() => {
+    if (errors.length > 0) {
+      console.log('Files with errors:')
+      errors.forEach(({ filename, err }) => {
+        console.log(filename)
+        console.log(err.stack)
+      })
+    }
   })
