@@ -106,6 +106,7 @@ clubnet.on('peer', function (peerId) {
       console.log('Peer', decoratePeerId(peerId), 'name resolved to new key', resolvedKey)
 
       var getP = ipfs.objectGet(resolvedKey + '/allthemusic/contents')
+      getP.catch(handleError('getting contents from peer\'s published key'))
       getP.then(() => fetchedKeys = fetchedKeys.add(resolvedKey))
       return getP.then(fetchContent)
     })
