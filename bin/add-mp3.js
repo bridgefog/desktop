@@ -259,9 +259,16 @@ if (filenames.length === 0) {
 }
 // console.log('filenames =', filenames)
 
-Promise.all(filenames.map(filename => addOneFile(filename)))
-  .then(R.reject(R.isNil))
-  .then(tracks => {
+var trackKeys = []
+R.reduce(
+  (prom, filename) => prom.then(() => {
+    return addOneFile(filename).then(key => trackKeys = trackKeys.concat(key))
+  }),
+  Promise.resolve(),
+  filenames
+)
+  .then(() => {
+    var tracks = R.reject(R.isNil, trackKeys)
     if (tracks.length === 0) { return }
     var newTrackKeys = R.map(R.path(['ipfs_keys', 'metadata']), tracks)
     console.log(newTrackKeys)
