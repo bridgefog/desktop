@@ -115,7 +115,7 @@ clubnet.on('peer', function (peerId) {
 ipfs.peerID()
   .then(peerId => {
     myPeerID = peerId
-    clubnet.addPeer(myID)
+    clubnet.addPeer(myPeerID)
   })
   .catch(handleError('getting local peer ID'))
   .then(getPeers)
