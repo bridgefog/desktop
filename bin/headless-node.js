@@ -96,10 +96,8 @@ function publishLoop() {
     .then(() => setTimeout(publishLoop, 1 * minute))
 }
 
-clubnet.on('newPeer', peerId => console.log('Found new peer: ', peerId))
-
-clubnet.on('peer', function (peerId) {
-  ipfs.nameResolve(peerId)
+function resolvePeer(peerId) {
+  return ipfs.nameResolve(peerId)
     .then(resolvedKey => {
       if (fetchedKeys.has(resolvedKey)) { return }
 
@@ -114,6 +112,16 @@ clubnet.on('peer', function (peerId) {
         .then(fetchContent)
     })
     .catch(handleError('looking up peer ' + peerId))
+}
+
+clubnet.on('newPeer', peerId => {
+  console.log('Found new peer: ', peerId)
+  resolvePeer(peerId)
+  setInterval(resolvePeer, 1 * minute, peerId)
+})
+
+clubnet.on('peer', function (peerId) {
+  console.log('Found peer: ', peerId)
 })
 
 ipfs.peerID()
