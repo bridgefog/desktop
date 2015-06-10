@@ -294,7 +294,7 @@ R.reduce(
     console.error('ERROR', e.stack)
   }).then(() => {
     if (errors.length > 0) {
-      console.log('Files with errors:')
+      console.log('Files with errors: (%d failed of %d files)', errors.length, filenames.length)
       errors.forEach(({ filename, err }) => {
         console.log(filename)
         console.log(err.stack)
