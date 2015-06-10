@@ -60,10 +60,10 @@ function fetchContent(thisPeersContents) {
     ipfs.objectGet(id)
       .then(object => {
         fetchedKeys = fetchedKeys.add(id)
-        tracks = tracks.add(id)
         var metadata = JSON.parse(object.Data)
         // metadata.id = id
         console.log('new track [%s]: %s - %s', id, metadata.artist, metadata.title)
+        tracks = tracks.add(id)
       })
       .catch(handleError('objectGet ' + id))
   })
