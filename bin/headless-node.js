@@ -6,7 +6,7 @@ import R from 'ramda'
 import { IPFSClient, DagObject, util as ipfsUtil } from 'atm-ipfs-api'
 import Clubnet from '../lib/clubnet'
 import Badge from '../lib/badge'
-import HashDecorate from '../lib/hash-decorate'
+import HashDecorator from '../lib/hash-decorator'
 
 var ipfs = new IPFSClient(ipfsUtil.ipfsEndpoint())
 var clubnet = new Clubnet(ipfs, () => new Badge())
@@ -14,13 +14,13 @@ var clubnet = new Clubnet(ipfs, () => new Badge())
 var fetchedKeys = new Set()
 var tracks = new Set()
 var myPeerID
-var decor = new HashDecorate()
+var decor = new HashDecorator()
 
 const second = 1000
 const minute = 60 * second
 
 function decoratePeerId(peerId) {
-  dPeerId = decor.ate(peerId)
+  var dPeerId = decor.ate(peerId)
   return '[' + (peerId === myPeerID ? `${dPeerId} (local node)` : dPeerId) + ']'
 }
 
