@@ -22,6 +22,22 @@ describe('HashDecorator', () => {
     decorateHashTestcase('QmYNmQKp6SuaVrpgWRsPTgCQCnpxUYGq76YEKBXuj2N4H6', 'never-wolf-flat')
     decorateHashTestcase('QmTz3oc4gdpRMKP2sdGUPZTAGRngqjsi99BPoztyP53JMM', 'fatigue-weapon-horror')
 
+    context('with incompatible options', () => {
+      context('words represent more bits than the hash contains', () => {
+        it('blows up', () => {
+          var hash = '9UW6qiPA'
+          var parsedHash = decorator.parseHash(hash)
+          assert.equal(parsedHash.length * 8, 32)
+          // bit length of the hash ^ is less than the bits represented by the
+          // words
+          assert.equal(decorator.wordCount * decorator.wordBitLength, 33)
+          assert.throws(() => decorator.decorateHash(hash))
+          // but a hash of this length absolutely works given fewer words
+          decorator.wordCount = 2
+          assert.doesNotThrow(() => decorator.decorateHash(hash))
+        })
+      })
+    })
   })
 
   describe('pickWords', () => {
