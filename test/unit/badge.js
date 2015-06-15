@@ -1,7 +1,5 @@
-'use strict'
-
 import { assert } from 'chai'
-import Badge from '../lib/badge'
+import Badge from '../../lib/badge'
 
 describe('Badge', function () {
   var now = Date.now()
@@ -13,13 +11,13 @@ describe('Badge', function () {
   describe('name calculation', function () {
     it('generates the correct string without a nameSpace', function () {
       assert.equal(subject().name,
-                   'AllTheMusic:' + Math.round(now / (1000 * 60 * 60)))
+                   'AllTheMusic:' + Math.round(now / (1000 * 60)))
     })
 
     it('generates the correct string with a nameSpace', function () {
       var namespace = 'search-term:Queen'
       assert.equal(subject(namespace).name,
-                   'AllTheMusic:' + namespace + Math.round(now / (1000 * 60 * 60)))
+                   'AllTheMusic:' + namespace + Math.round(now / (1000 * 60)))
     })
   })
 

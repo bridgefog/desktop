@@ -10,6 +10,9 @@ var newer = require('gulp-newer')
 var plumber = require('gulp-plumber')
 var proc = require('child_process')
 var sourcemaps = require('gulp-sourcemaps')
+var mocha = require('gulp-mocha')
+require('babel/register')
+var mochaReporter = require('./test/support/gulp-mocha-reporter')
 
 var globs = {
   javascripts: ['./lib/**/*.js'],
@@ -17,15 +20,21 @@ var globs = {
   static: ['./static/**/*'],
   rc_files: ['./.js*rc'],
   gulpfile: [__filename],
-  tests: ['./test/*.js'],
+  unit_tests: ['test/unit/**/*.js'],
+  integration_tests: ['test/integration/**/*.js'],
+  test_support: ['test/support/**/*.js'],
   dest: ['./dist'],
   bin: ['./bin/*'],
 }
-globs.jsAndJSONFiles = [].concat(
+globs.allJS = [].concat(
   globs.javascripts,
-  globs.tests,
   globs.bin,
   globs.gulpfile,
+  globs.unit_tests,
+  globs.integration_tests,
+  globs.test_support
+)
+globs.allJSON = [].concat(
   globs.rc_files,
   globs.package_json
 )
@@ -61,12 +70,12 @@ gulp.task('watch-static-bundle', ['static-bundle'], function () {
 })
 
 gulp.task('jscs', function () {
-  return gulp.src([].concat(globs.javascripts, globs.tests, globs.bin, globs.gulpfile))
+  return gulp.src([].concat(globs.allJS))
     .pipe(jscs())
 })
 
 gulp.task('jshint', function () {
-  return gulp.src(globs.jsAndJSONFiles)
+  return gulp.src([].concat(globs.allJS, globs.allJSON))
     .pipe(gulpJshint({ linter: jsxhint }))
 })
 
@@ -87,6 +96,8 @@ gulp.task('default', [
   'watch-lint',
   'watch-js-bundle',
   'watch-static-bundle',
+  'watch-unit-tests',
+  'test',
   'electron',
 ])
 
@@ -97,9 +108,27 @@ gulp.task('watch-lint', function () {
   // watch task dependent on success of initial `lint` run
   gulp.start('lint')
 
-  return gulp.watch(globs.jsAndJSONFiles, ['lint'])
+  return gulp.watch([].concat(globs.allJS, globs.allJSON), ['lint'])
 })
 
-gulp.task('test', ['lint'])
+gulp.task('unit-tests', function () {
+  return gulp.src(globs.unit_tests, { read: false })
+    .pipe(mocha({ reporter: mochaReporter, }))
+})
+
+gulp.task('integration-tests', function () {
+  return gulp.src(globs.integration_tests, { read: false })
+    .pipe(mocha({ reporter: mochaReporter, }))
+})
+
+gulp.task('test', ['unit-tests', 'lint'])
+
+gulp.task('watch-unit-tests', function () {
+  gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), ['unit-tests'])
+})
+
+gulp.task('watch-integration-tests', function () {
+  gulp.watch([].concat(globs.javascripts, globs.integration_tests, globs.test_support), ['integration-tests'])
+})
 
 gulp.task('dist', ['js-bundle', 'static-bundle'])
