@@ -1,6 +1,5 @@
 import HashDecorator from '../../lib/hash-decorator'
 
-import sinon from 'sinon'
 import { assert } from 'chai'
 
 describe('HashDecorator', () => {
