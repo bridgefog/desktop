@@ -3,6 +3,7 @@
 // import util from 'util'
 import { Set } from 'immutable'
 import R from 'ramda'
+import devNull from 'dev-null'
 import { IPFSClient, DagObject, util as ipfsUtil } from 'atm-ipfs-api'
 import Clubnet from '../lib/clubnet'
 import Badge from '../lib/badge'
@@ -54,6 +55,18 @@ function getPeers() {
   return clubnet.findPeers().catch(handleError('getPeers'))
 }
 
+function preFetchFile(path) {
+  var logPrefix = `[preFetchFile ${path}]`
+  return ipfs.cat(path)
+    .then(stream => {
+      return stream
+        .on('error', handleError(logPrefix + '[stream-error]'))
+        .on('end', () => console.log(logPrefix, 'success'))
+        .pipe(devNull())
+    })
+    .catch(handleError(logPrefix))
+}
+
 function fetchContent(thisPeersContents) {
   var contents = new Set().union(R.pluck('Hash', thisPeersContents.Links))
   contents = contents.subtract(fetchedKeys)
@@ -66,6 +79,9 @@ function fetchContent(thisPeersContents) {
         // metadata.id = id
         console.log('new track [%s]: %s - %s', id, metadata.artist, metadata.title)
         tracks = tracks.add(id)
+
+        preFetchFile(id + '/file')
+        preFetchFile(id + '/image')
       })
       .catch(handleError('objectGet ' + id))
   })
