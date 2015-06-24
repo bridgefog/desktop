@@ -43,7 +43,7 @@
     "allowUrlComments": true,
     "value": 120
   },
-  "requireBlocksOnNewline": 1,
+  "requireBlocksOnNewline": 2,
   "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
   "requireCapitalizedConstructors": true,
   "requireCommaBeforeLineBreak": true,
