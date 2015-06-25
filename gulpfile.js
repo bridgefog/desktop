@@ -24,7 +24,7 @@ var globs = {
   integration_tests: ['test/integration/**/*.js'],
   test_support: ['test/support/**/*.js'],
   dest: ['./dist'],
-  bin: ['./bin/*'],
+  bin: ['./bin/*.js'],
 }
 globs.allJS = [].concat(
   globs.javascripts,

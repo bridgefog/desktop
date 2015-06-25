@@ -1,5 +1,3 @@
-'use strict'
-
 import sinon from 'sinon'
 import streamify from 'stream-array'
 import { assert } from 'chai'
