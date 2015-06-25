@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# This is a longer (~9meg) mp3
+ipfs get QmSYhvNcdzQ4Qqdmx38BMu9J759hVnMajefMUyKzjs2Ua1
+mv QmSYhvNcdzQ4Qqdmx38BMu9J759hVnMajefMUyKzjs2Ua1 test/fixtures/MLKDream.mp3
+
+ipfs get QmVUaz5ActFDKkPSxvKw1gUZCS2ZjVe8L6M7fTXtXxHB6j
+mv QmVUaz5ActFDKkPSxvKw1gUZCS2ZjVe8L6M7fTXtXxHB6j test/fixtures/MLK.jpg
+
+# Bunch of short stuff and images
+ipfs get QmPf84N9Y4ra3sGeW295JtKcwBfLMrauMQn2pMgDoGFgk5
+mv QmPf84N9Y4ra3sGeW295JtKcwBfLMrauMQn2pMgDoGFgk5/ test/fixtures/collection

@@ -1,3 +1,5 @@
 node_modules/
 dist/
 tmp/
+test/fixtures/**/*.mp3
+test/fixtures/**/*.jpg
