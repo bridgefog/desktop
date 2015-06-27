@@ -15,53 +15,25 @@ import { Set } from 'immutable'
 import { IPFSClient, DagObject, util as ipfsUtil } from 'atm-ipfs-api'
 import Clubnet from '../lib/clubnet'
 import Badge from '../lib/badge'
+import MusicCollection from '../lib/upload/music-collection'
+import Contents from '../lib/contents'
 
 const ACOUSTID_APP_TOKEN = 'OomsDyzs'
 
-var filterFilenames = R.filter(name => name.endsWith('.mp3'))
+var ipfs = new IPFSClient(ipfsUtil.ipfsEndpoint())
+var clubnet = new Clubnet(ipfs, () => new Badge())
 
-var filterTags = R.pick([
-  'artist',
-  'title',
-  'album',
-  'genre',
-  'track_number',
-  'year',
-  'publisher',
-])
+var collection = new MusicCollection(process.argv.slice(2))
 
-class Track{
-  constructor(path, tags, image) {
-    this.path = path
-    this.tags = tags
-    this.image = image
-    this.size = 0
-    this.chromaprint = null
-    this.duration = null
-    this.acoustid_track_id = null
-    this.ipfs_keys = {
-      metadata: null,
-      media: null,
-      image: null,
-    }
-  }
+if (collection.musicFiles.length === 0) {
+  console.error('ERROR: Supply one or more *.mp3 filename arguments')
+  process.exit(1)
 }
 
-function readMp3(filename) {
-  return new Promise((resolve, reject) => {
-    console.time('readMp3: ' + filename)
-    id3.read(filename, (err, data) => {
-      if (err) {
-        reject(err)
-        return
-      }
-      var image = data.attached_picture
-      var tags = filterTags(data)
-      resolve(new Track(filename, tags, image))
-      console.timeEnd('readMp3: ' + filename)
-    })
-  })
-}
+var contents = new Contents()
+contents.current().then(n => console.log('contents:', n))
+
+// .then(process.exit)
 
 function fingerprintFile(filename) {
   console.time('fingerprinting: ' + filename)
@@ -131,35 +103,6 @@ function getFirstFrontImageFromCoverArt(coverartResult) {
   return imageResult.image // return just the URL
 }
 
-function getFileSize(filename) {
-  return new Promise((resolve, reject) => {
-    console.time('stat: ' + filename)
-    fs.stat(filename, (err, stat) => {
-      if (err) { return reject(err) }
-      resolve(stat.size)
-      console.timeEnd('stat: ' + filename)
-    })
-  })
-}
-
-function ipfsAddFile(filename) {
-  return new Promise((resolve, reject) => {
-    console.time('ipfsAddFile: ' + filename)
-    var output = ''
-    var proc = childProcess.spawn('ipfs', ['add', '--quiet', filename], { stdio: ['inherit', 'pipe', 'inherit'] })
-    proc.stdout.on('data', data => output += data.toString())
-    proc.on('close', code => {
-      if (code === 0) {
-        resolve(output.trim())
-      } else {
-        console.log('exited ' + code)
-        reject()
-      }
-      console.timeEnd('ipfsAddFile: ' + filename)
-    })
-  })
-}
-
 function buildMetadataNode(track) {
   var metadata = R.merge(track.tags, {
     fingerprints: {
@@ -218,17 +161,6 @@ function addDirectoryTree(contents) {
           ipfs.objectPut(new DagObject().addLink('allthemusic', atmNodeHash)))
 }
 
-function getCurrentContents() {
-  return ipfs.nameResolveSelf()
-    .then(publishedKey => ipfs.objectGet(publishedKey + '/allthemusic/contents'))
-    .then(contentsNode => R.pluck('Hash', contentsNode.Links))
-    .catch(err => {
-      console.error('Failed to resolve current published contents')
-      console.error(err.stack)
-      return []
-    })
-}
-
 function downloadFileIntoIpfs(url) {
   if (!url) { return false }
   var tmpfile = tmp.fileSync()
@@ -247,57 +179,47 @@ function downloadFileIntoIpfs(url) {
   }).then(() => ipfsAddFile(tmpfile.name))
 }
 
-var ipfs = new IPFSClient(ipfsUtil.ipfsEndpoint())
-var clubnet = new Clubnet(ipfs, () => new Badge())
-
-var filenames = filterFilenames(process.argv.slice(2))
-if (filenames.length === 0) {
-  console.error('ERROR: Supply one or more *.mp3 filename arguments')
-  process.exit(1)
-}
-// console.log('filenames =', filenames)
-
 var trackKeys = []
 var errors = []
-R.reduce(
-  (prom, filename) => prom.then(() => {
-    return addOneFile(filename)
-      .then(key => trackKeys = trackKeys.concat(key))
-      .catch(err => {
-        errors = errors.concat({ filename, err });
-      })
-  }),
-  Promise.resolve(),
-  filenames
-)
-  .then(() => {
-    var tracks = R.reject(R.isNil, trackKeys)
-    if (tracks.length === 0) { return }
-    var newTrackKeys = R.map(R.path(['ipfs_keys', 'metadata']), tracks)
-    console.log(newTrackKeys)
+// R.reduce(
+//   (prom, filename) => prom.then(() => {
+//     return addOneFile(filename)
+//       .then(key => trackKeys = trackKeys.concat(key))
+//       .catch(err => {
+//         errors = errors.concat({ filename, err });
+//       })
+//   }),
+//   Promise.resolve(),
+//   filenames
+// )
+//   .then(() => {
+//     var tracks = R.reject(R.isNil, trackKeys)
+//     if (tracks.length === 0) { return }
+//     var newTrackKeys = R.map(R.path(['ipfs_keys', 'metadata']), tracks)
+//     console.log(newTrackKeys)
 
-    console.log('Republishing...')
-    console.time('republishing')
-    return clubnet.wearBadge()
-      .then(getCurrentContents)
-      .then(contents => {
-        var newContents = new Set(contents).union(newTrackKeys).toJS()
-        return addDirectoryTree(newContents)
-      })
-      .then(newKey => ipfs.namePublish(newKey))
-      .then(() => console.timeEnd('republishing'))
-      .catch(e => {
-        console.error('ERROR', e.stack)
-      })
-  })
-  .catch(e => {
-    console.error('ERROR', e.stack)
-  }).then(() => {
-    if (errors.length > 0) {
-      console.log('Files with errors: (%d failed of %d files)', errors.length, filenames.length)
-      errors.forEach(({ filename, err }) => {
-        console.log(filename)
-        console.log(err.stack)
-      })
-    }
-  })
+//     console.log('Republishing...')
+//     console.time('republishing')
+//     return clubnet.wearBadge()
+//       .then(getCurrentContents)
+//       .then(contents => {
+//         var newContents = new Set(contents).union(newTrackKeys).toJS()
+//         return addDirectoryTree(newContents)
+//       })
+//       .then(newKey => ipfs.namePublish(newKey))
+//       .then(() => console.timeEnd('republishing'))
+//       .catch(e => {
+//         console.error('ERROR', e.stack)
+//       })
+//   })
+//   .catch(e => {
+//     console.error('ERROR', e.stack)
+//   }).then(() => {
+//     if (errors.length > 0) {
+//       console.log('Files with errors: (%d failed of %d files)', errors.length, filenames.length)
+//       errors.forEach(({ filename, err }) => {
+//         console.log(filename)
+//         console.log(err.stack)
+//       })
+//     }
+//   })
