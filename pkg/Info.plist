@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Electron</string>
 	<key>CFBundleIconFile</key>
-  <string>music-512.icns</string>
+  <string>app/dist/music-512.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.allthemusic.beam</string>
 	<key>CFBundleInfoDictionaryVersion</key>

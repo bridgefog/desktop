@@ -41,8 +41,7 @@
     "jshint-stylish": "^1.0.1",
     "mocha": "^2.2.1",
     "sinon": "^1.14.1",
-    "stream-array": "^1.1.0",
-    "through2-map": "^1.4.0"
+    "stream-array": "^1.1.0"
   },
   "dependencies": {
     "acoustid": "allthemusic/node-acoustid",
@@ -59,6 +58,7 @@
     "nodebrainz": "^1.0.1",
     "ramda": "^0.13.0",
     "react": "^0.13.2",
+    "through2-map": "^1.4.0",
     "tmp": "0.0.26"
   }
 }
