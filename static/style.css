@@ -2,3 +2,7 @@ html, body {
   background-color: #000;
   color: #eee;
 }
+
+:focus {
+  outline: none
+}
