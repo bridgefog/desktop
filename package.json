@@ -1,20 +1,20 @@
 {
-  "name": "atm-desktop",
+  "name": "bridgefog-desktop",
   "version": "1.0.0",
-  "description": "Desktop application for AllTheMusic",
+  "description": "Desktop application for bridgefog",
   "main": "dist/main.js",
   "scripts": {},
   "private": true,
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/allthemusic/desktop.git"
+    "url": "https://github.com/bridgefog/desktop.git"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/allthemusic/desktop/issues"
+    "url": "https://github.com/bridgefog/desktop/issues"
   },
-  "homepage": "https://github.com/allthemusic/desktop",
+  "homepage": "https://github.com/bridgefog/desktop",
   "devDependencies": {
     "babel": "^5.0.8",
     "babel-core": "^5.4.7",
@@ -44,7 +44,7 @@
     "stream-array": "^1.1.0"
   },
   "dependencies": {
-    "acoustid": "allthemusic/node-acoustid",
+    "acoustid": "bridgefog/node-acoustid",
     "alt": "^0.16.2",
     "atm-ipfs-api": "0.0.5-alpha1",
     "babel-runtime": "^5.4.7",

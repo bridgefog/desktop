@@ -5,17 +5,17 @@
 	<key>BuildMachineOSBuild</key>
 	<string>14D136</string>
 	<key>CFBundleDisplayName</key>
-	<string>Beam</string>
+	<string>BridgeFog</string>
 	<key>CFBundleExecutable</key>
 	<string>Electron</string>
 	<key>CFBundleIconFile</key>
   <string>app/dist/music-512.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.allthemusic.beam</string>
+	<string>com.bridgefog.beam</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Beam</string>
+	<string>BridgeFog</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleVersion</key>
