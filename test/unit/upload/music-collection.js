@@ -1,4 +1,5 @@
 import R from 'ramda'
+import glob from 'glob'
 import { assert } from 'chai'
 import MusicCollection from '../../../lib/upload/music-collection'
 import Track from '../../../lib/upload/track'
@@ -20,24 +21,43 @@ describe('MusicCollection', () => {
     return assert.deepEqual(collection.imageFiles, images)
   })
 
-  it('Syncronasly gets the fs size', () => {
-    var filePaths = '../../fixtures/collection/*'
+  it('Finds first jpg in collection', () => {
+    var filePaths = glob.sync('test/fixtures/collection/*')
     var collection = new MusicCollection(filePaths)
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    console.log(collection.musicFiles)
+    var firstFixtureImage =
+      'test/fixtures/collection/Circle-in-the-water-Wave-Rings_480x360.jpg'
 
+    return assert.deepEqual(collection.firstImage, firstFixtureImage)
+  })
+
+  it('Returns falsey if no jpg in collection', () => {
+    var filePaths = glob.sync('test/fixtures/not_a_path/*')
+    var collection = new MusicCollection(filePaths)
+
+    return assert(!collection.firstImage)
+  })
+
+  it('Syncronasly gets the fs size', () => {
+    var filePaths = glob.sync('test/fixtures/collection/*')
+    var collection = new MusicCollection(filePaths)
     var sizes = []
+
     return collection.musicFiles.reduce((sequence, musicPath) => {
       return sequence.then(() => {
-        console.log('path', musicPath)
         var track = new Track(musicPath)
         return track.readSize()
       }).then((size) => {
         sizes.push(size)
-        console.log('size', size)
       })
     }, Promise.resolve()).then(() => {
-      return assert.deepEqual(sizes, [])
+      return assert.deepEqual([
+        618295,
+        1126621,
+        587798,
+        349728,
+        875722,
+        787154,
+      ], sizes)
     })
   })
 })

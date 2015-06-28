@@ -12,7 +12,7 @@ describe('Track', () => {
   var imageKey = 'QmVUaz5ActFDKkPSxvKw1gUZCS2ZjVe8L6M7fTXtXxHB6j'
 
   it('Reads its own size', () => {
-    return track.readSize().then((size) => assert.equal(size, 9398038))
+    return track.readSize().then(() => assert.equal(track.size, 9398038))
   })
 
   it('Adds music file to IPFS and remembers its key', () => {
@@ -23,4 +23,14 @@ describe('Track', () => {
     return track.addImageToIPFS().then(() => assert.deepEqual(track.imageKey, imageKey))
   })
 
+  it('Creates metadata node', () => {
+    var track = new Track(
+      'test/fixtures/collection/Hammer-knocking-multiple-nail-into-a-plank-of-pine-wood.mp3',
+      'test/fixtures/collection/Raindrops-on-Window-Glass-after-Rain__IMG_2950-580x386.jpg'
+    )
+    return track.addMetadataToIPFS().then(() => {
+      // TODO: verify this key is correct
+      assert.deepEqual(track.metadataKey, 'QmThKwEd9CaZYE6F7pjN7sVqJa7fqKShT2s4xvywxK6G8v')
+    })
+  })
 })
