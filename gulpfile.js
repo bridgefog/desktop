@@ -11,6 +11,7 @@ var plumber = require('gulp-plumber')
 var proc = require('child_process')
 var sourcemaps = require('gulp-sourcemaps')
 var mocha = require('gulp-mocha')
+var R = require('ramda')
 require('babel/register')
 var mochaReporter = require('./test/support/gulp-mocha-reporter')
 
@@ -85,22 +86,30 @@ gulp.task('livereload', function () {
 
 gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
   console.log('Starting electron shell ', electron)
-  var electronProc = proc.spawn(electron, ['--disable-http-cache', __dirname])
+  var electronProc = proc.spawn(electron, ['--disable-http-cache', __dirname], {
+    stdio: ['inherit', 'inherit', 'inherit'],
+    env: R.merge(process.env, {
+      GULP: 'true'
+    }),
+  })
   electronProc.on('exit', function () {
     done()
     gulp.start('electron')
   })
 })
 
-gulp.task('default', [
+var defaultPrereqs = [
   'livereload',
   'watch-lint',
   'watch-js-bundle',
   'watch-static-bundle',
   'watch-unit-tests',
   'test',
+]
+gulp.task('default', defaultPrereqs.concat([
   'electron',
-])
+]))
+gulp.task('default-without-electron', defaultPrereqs)
 
 gulp.task('lint', ['jscs', 'jshint'])
 
