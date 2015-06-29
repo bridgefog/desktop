@@ -43,7 +43,7 @@ copy_dist_into_dot_app() {
 }
 
 copy_ipfs_into_dot_app() {
-  ipfs_path="$1"
+  local ipfs_path="$1"
   mkdir -p ./pkg/app/BridgeFog.app/Contents/Resources/app/vendor;
   cp -a "$ipfs_path" ./pkg/app/BridgeFog.app/Contents/Resources/app/vendor;
 }
@@ -57,5 +57,5 @@ prepare_dist
 ipfs_path=$(get_ipfs)
 copy_dot_app
 copy_dist_into_dot_app
-copy_ipfs_into_dot_app
+copy_ipfs_into_dot_app "$ipfs_path"
 package_dmg
