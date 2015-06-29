@@ -4455,6 +4455,18 @@
       "from": "jquery@>=2.1.3 <3.0.0",
       "resolved": "https://registry.npmjs.org/jquery/-/jquery-2.1.4.tgz"
     },
+    "mkdirp": {
+      "version": "0.5.1",
+      "from": "mkdirp@*",
+      "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
+      "dependencies": {
+        "minimist": {
+          "version": "0.0.8",
+          "from": "minimist@0.0.8",
+          "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
+        }
+      }
+    },
     "multihashes": {
       "version": "0.1.2",
       "from": "multihashes@*",
