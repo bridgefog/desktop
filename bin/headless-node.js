@@ -1,6 +1,5 @@
 #!/usr/bin/env babel-node
 
-// import util from 'util'
 import { Set } from 'immutable'
 import R from 'ramda'
 import devNull from 'dev-null'
@@ -32,12 +31,12 @@ function publish(key) {
     .catch(handleError('publish'))
 }
 
-function wearBadge() {
-  return clubnet.wearBadge().then(key => {
-    console.log('badge key =', key._hash)
-    return key
-  }).catch(handleError('wearBadge'))
-}
+// function wearBadge() {
+//   return clubnet.wearBadge().then(key => {
+//     console.log('badge key =', key._hash)
+//     return key
+//   }).catch(handleError('wearBadge'))
+// }
 
 function handleError(scope) {
   return function (err) {
