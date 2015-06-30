@@ -94,7 +94,7 @@ gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
   })
   electronProc.on('exit', function () {
     done()
-    gulp.start('electron')
+    // gulp.start('electron')
   })
 })
 
@@ -106,10 +106,8 @@ var defaultPrereqs = [
   'watch-unit-tests',
   'test',
 ]
-gulp.task('default', defaultPrereqs.concat([
-  'electron',
-]))
-gulp.task('default-without-electron', defaultPrereqs)
+
+gulp.task('default', defaultPrereqs)
 
 gulp.task('lint', ['jscs', 'jshint'])
 
