@@ -1,12 +1,17 @@
 #!/bin/bash
 
+set -e -x
+
+getFixture() {
+  ipfs get $1
+  mv $1 test/fixtures/$2
+}
+
 # This is a longer (~9meg) mp3
-ipfs get QmSYhvNcdzQ4Qqdmx38BMu9J759hVnMajefMUyKzjs2Ua1
-mv QmSYhvNcdzQ4Qqdmx38BMu9J759hVnMajefMUyKzjs2Ua1 test/fixtures/MLKDream.mp3
-
-ipfs get QmVUaz5ActFDKkPSxvKw1gUZCS2ZjVe8L6M7fTXtXxHB6j
-mv QmVUaz5ActFDKkPSxvKw1gUZCS2ZjVe8L6M7fTXtXxHB6j test/fixtures/MLK.jpg
-
+getFixture QmSYhvNcdzQ4Qqdmx38BMu9J759hVnMajefMUyKzjs2Ua1 MLKDream.mp3 &
+getFixture QmVUaz5ActFDKkPSxvKw1gUZCS2ZjVe8L6M7fTXtXxHB6j MLK.jpg &
 # Bunch of short stuff and images
-ipfs get QmPf84N9Y4ra3sGeW295JtKcwBfLMrauMQn2pMgDoGFgk5
-mv QmPf84N9Y4ra3sGeW295JtKcwBfLMrauMQn2pMgDoGFgk5/ test/fixtures/collection
+getFixture QmPf84N9Y4ra3sGeW295JtKcwBfLMrauMQn2pMgDoGFgk5 collection &
+
+
+wait

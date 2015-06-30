@@ -13,3 +13,5 @@ if ! which fpcalc 2> /dev/null; then
     echo "ERROR: fpcalc not found in $PATH -- this is needed for adding music!" >&2
   fi
 fi
+
+bin/install-test-fixtures
