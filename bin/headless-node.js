@@ -54,16 +54,31 @@ function getPeers() {
   return clubnet.findPeers().catch(handleError('getPeers'))
 }
 
+
+var filesCompletedPrefetch = []
+var filesToPrefetch = []
+
+function preFetchFiles() {
+  if (filesToPrefetch.length > 0) {
+    console.log('files to prefetch', filesToPrefetch.length)
+    var path = filesToPrefetch.pop()
+    var logPrefix = `[preFetchFile ${path}]`
+    return ipfs.cat(path)
+      .then(stream => {
+        return stream
+          .on('error', handleError(logPrefix + '[stream-error]'))
+          .on('end', () => console.log(logPrefix, 'success'))
+          .pipe(devNull())
+      })
+      .catch(handleError(logPrefix))
+  }
+}
+
 function preFetchFile(path) {
-  var logPrefix = `[preFetchFile ${path}]`
-  return ipfs.cat(path)
-    .then(stream => {
-      return stream
-        .on('error', handleError(logPrefix + '[stream-error]'))
-        .on('end', () => console.log(logPrefix, 'success'))
-        .pipe(devNull())
-    })
-    .catch(handleError(logPrefix))
+  if (filesCompletedPrefetch.indexOf(path) < 0) {
+    filesToPrefetch.push(path)
+    filesCompletedPrefetch.push(path)
+  }
 }
 
 function fetchContent(thisPeersContents) {
@@ -76,7 +91,7 @@ function fetchContent(thisPeersContents) {
         fetchedKeys = fetchedKeys.add(id)
         var metadata = JSON.parse(object.Data)
         // metadata.id = id
-        console.log('new track [%s]: %s - %s', id, metadata.artist, metadata.title)
+        // console.log('new track [%s]: %s - %s', id, metadata.artist, metadata.title)
         tracks = tracks.add(id)
 
         preFetchFile(id + '/file')
@@ -152,3 +167,4 @@ ipfs.peerID()
   .then(publishLoop)
 
 setInterval(getPeers, 20 * second)
+setInterval(preFetchFiles, 1 * second)
