@@ -54,7 +54,6 @@ function getPeers() {
   return clubnet.findPeers().catch(handleError('getPeers'))
 }
 
-
 var filesCompletedPrefetch = []
 var filesToPrefetch = []
 
