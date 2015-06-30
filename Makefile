@@ -1,4 +1,4 @@
-.PHONY: init
+.PHONY: init build
 
 all: init
 
@@ -6,6 +6,7 @@ test: init
 	npm test
 
 init: node_modules
-	npm prune
-	npm update
-	which fpcalc 2> /dev/null || brew install chromaprint
+	./bin/init.sh
+
+build: init
+	./bin/build.sh
