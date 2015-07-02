@@ -5,7 +5,7 @@ all: init
 test: init
 	npm test
 
-init: node_modules
+init:
 	./bin/init.sh
 
 build: init

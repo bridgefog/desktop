@@ -1,16 +1,16 @@
 #!/bin/bash
 
-set -e -x
+set -e
 
 npm prune
-npm update
+npm install
 
 if ! which fpcalc 2> /dev/null; then
   OS=`uname`
-  if [ "$OS" -eq "Darwin" ] && which brew 2> /dev/null; then
+  if [[ "$OS" == "Darwin" ]] && which brew 2> /dev/null; then
     brew install chromaprint
   else
-    echo "ERROR: fpcalc not found in $PATH -- this is needed for adding music!" >&2
+    echo 'WARNING: fpcalc not found in $PATH -- this is needed for adding music!' >&2
   fi
 fi
 
