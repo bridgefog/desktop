@@ -2,8 +2,12 @@
 
 set -e
 
-npm prune
+set -x
 npm install
+npm prune
+electron-rebuild
+bin/install-test-fixtures
+set +x
 
 if ! which fpcalc 2> /dev/null; then
   OS=`uname`
@@ -13,5 +17,3 @@ if ! which fpcalc 2> /dev/null; then
     echo 'WARNING: fpcalc not found in $PATH -- this is needed for adding music!' >&2
   fi
 fi
-
-bin/install-test-fixtures
