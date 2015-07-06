@@ -58,3 +58,18 @@ html, body {
 :focus {
   outline: none
 }
+
+::-webkit-scrollbar {
+    opacity: 1;
+    background: rgb(28,28,31);
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    opacity: 0;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background: rgb(50,52,56);
+}
