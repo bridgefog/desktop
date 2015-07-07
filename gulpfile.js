@@ -88,14 +88,9 @@ gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
   console.log('Starting electron shell ', electron)
   var electronProc = proc.spawn(electron, ['--disable-http-cache', __dirname], {
     stdio: ['inherit', 'inherit', 'inherit'],
-    env: R.merge(process.env, {
-      GULP: 'true'
-    }),
+    env: R.merge(process.env, { GULP: 'true' }),
   })
-  electronProc.on('exit', function () {
-    done()
-    // gulp.start('electron')
-  })
+  electronProc.on('exit', done)
 })
 
 var defaultPrereqs = [
