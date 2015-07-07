@@ -25,5 +25,5 @@ then:
 3. In this directory, run `npm link atm-ipfs-api`
 
 [electron]: https://github.com/atom/electron
-[atm-ifps-api]: https://github.com/allthemusic/atm-ipfs-api
+[atm-ipfs-api]: https://github.com/allthemusic/atm-ipfs-api
 [npm-link]: https://docs.npmjs.com/cli/link
