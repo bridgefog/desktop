@@ -40,6 +40,7 @@
     "jshint-jsx": "^0.4.1",
     "jshint-stylish": "^1.0.1",
     "mocha": "^2.2.1",
+    "rmrf": "^1.0.2",
     "sinon": "^1.14.1",
     "stream-array": "^1.1.0"
   },
@@ -62,6 +63,7 @@
     "nodebrainz": "^1.0.1",
     "ramda": "^0.13.0",
     "react": "^0.13.2",
+    "tar": "^2.1.1",
     "through2-map": "^1.4.0",
     "tmp": "0.0.26"
   }
