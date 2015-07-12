@@ -13,7 +13,6 @@
     "else"
   ],
   "disallowMixedSpacesAndTabs": true,
-  "disallowMultipleLineBreaks": true,
   "disallowMultipleLineStrings": true,
   "disallowMultipleVarDecl": true,
   "disallowNewlineBeforeBlockStatements": true,
@@ -39,10 +38,6 @@
   "disallowYodaConditions": true,
   "esnext": true,
   "esprima": "esprima-fb",
-  "maximumLineLength": {
-    "allowUrlComments": true,
-    "value": 120
-  },
   "requireBlocksOnNewline": 2,
   "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
   "requireCapitalizedConstructors": true,
