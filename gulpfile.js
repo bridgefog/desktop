@@ -119,6 +119,11 @@ gulp.task('unit-tests', function () {
     .pipe(mocha({ reporter: mochaReporter, }))
 })
 
+gulp.task('unit-tests-spec-reporter', function () {
+  return gulp.src(globs.unit_tests, { read: false })
+    .pipe(mocha({ reporter: 'spec', }))
+})
+
 gulp.task('integration-tests', function () {
   return gulp.src(globs.integration_tests, { read: false })
     .pipe(mocha({ reporter: mochaReporter, }))
@@ -127,7 +132,7 @@ gulp.task('integration-tests', function () {
 gulp.task('test', ['unit-tests', 'lint'])
 
 gulp.task('watch-unit-tests', function () {
-  gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), ['unit-tests'])
+  gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), ['unit-tests-spec-reporter'])
 })
 
 gulp.task('watch-integration-tests', function () {
