@@ -46,12 +46,6 @@ describe('Clubnet', function () {
         .then((peers) => assert.deepEqual(peers, discoveredProvidersIDs))
     })
 
-    it('exposes found peers as .peerlist', function () {
-      var clubnet = buildClubnet()
-      return clubnet.findPeers()
-        .then(() => assert.deepEqual(clubnet.peerlist.toJS(), discoveredProvidersIDs))
-    })
-
     it('emits "peer" for each peer discovered', function () {
       var clubnet = buildClubnet()
       var emittedPeers = []
@@ -60,19 +54,6 @@ describe('Clubnet', function () {
 
       return clubnet.findPeers()
         .then(() => assert.deepEqual(emittedPeers, discoveredProvidersIDs))
-    })
-
-    it('emits "newPeer" for each new peer discovered', function () {
-      var clubnet = buildClubnet()
-      var emittedPeers = []
-
-      // lets assume it already found peer_1
-      clubnet.addPeer('peer_1')
-
-      clubnet.on('newPeer', p => emittedPeers.push(p))
-
-      return clubnet.findPeers()
-        .then(() => assert.deepEqual(emittedPeers, ['peer_2', 'peer_3']))
     })
   })
 })
