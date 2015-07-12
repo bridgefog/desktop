@@ -132,6 +132,10 @@ gulp.task('integration-tests', function () {
 gulp.task('test', ['unit-tests', 'lint'])
 
 gulp.task('watch-unit-tests', function () {
+  gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), ['unit-tests'])
+})
+
+gulp.task('watch-unit-tests-spec-reporter', function () {
   gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), ['unit-tests-spec-reporter'])
 })
 
