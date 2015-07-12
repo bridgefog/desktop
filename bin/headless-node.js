@@ -18,9 +18,9 @@ var myPeerID
 const second = 1000
 const minute = 60 * second
 
-function decoratePeerId(peerId) {
-  var dPeerId = decorateHash(peerId)
-  return '[' + (peerId === myPeerID ? `${dPeerId} (local node)` : dPeerId) + ']'
+function decoratePeerID(peerID) {
+  var dPeerID = decorateHash(peerID)
+  return '[' + (peerID === myPeerID ? `${dPeerID} (local node)` : dPeerID) + ']'
 }
 
 function publish(key) {
@@ -127,12 +127,12 @@ function publishLoop() {
     .then(() => setTimeout(publishLoop, 1 * minute))
 }
 
-function resolvePeer(peerId) {
-  return ipfs.nameResolve(peerId)
+function resolvePeer(peerID) {
+  return ipfs.nameResolve(peerID)
     .then(resolvedKey => {
       if (fetchedKeys.has(resolvedKey)) { return }
 
-      console.log('Peer', decoratePeerId(peerId), 'name resolved to new key', resolvedKey)
+      console.log('Peer', decoratePeerID(peerID), 'name resolved to new key', resolvedKey)
 
       return ipfs.objectGet(resolvedKey + '/allthemusic/contents')
         .catch(handleError('getting contents from peer\'s published key'))
@@ -142,23 +142,23 @@ function resolvePeer(peerId) {
         })
         .then(fetchContent)
     })
-    .catch(handleError('looking up peer ' + peerId))
+    .catch(handleError('looking up peer ' + peerID))
 }
 
-clubnet.on('newPeer', peerId => {
-  console.log('Found new peer:', decoratePeerId(peerId))
-  resolvePeer(peerId)
-  if (peerId == myPeerID) { return }
-  setInterval(resolvePeer, 1 * minute, peerId)
+clubnet.on('newPeer', peerID => {
+  console.log('Found new peer:', decoratePeerID(peerID))
+  resolvePeer(peerID)
+  if (peerID == myPeerID) { return }
+  setInterval(resolvePeer, 1 * minute, peerID)
 })
 
-clubnet.on('peer', function (peerId) {
-  console.log('Found peer:', decoratePeerId(peerId))
+clubnet.on('peer', function (peerID) {
+  console.log('Found peer:', decoratePeerID(peerID))
 })
 
 ipfs.peerID()
-  .then(peerId => {
-    myPeerID = peerId
+  .then(peerID => {
+    myPeerID = peerID
     clubnet.addPeer(myPeerID)
   })
   .catch(handleError('getting local peer ID'))
