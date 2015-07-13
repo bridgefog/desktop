@@ -1,0 +1,11 @@
+#!/bin/bash
+
+openssl genrsa -out test/fixtures/key1.pem 2048
+openssl genrsa -out test/fixtures/key2.pem 2048
+openssl genrsa -out test/fixtures/key3.pem 2048
+openssl genrsa -out test/fixtures/key4.pem 2048
+
+openssl rsa -in test/fixtures/key1.pem -out test/fixtures/key1.pub.pem -outform PEM -pubout
+openssl rsa -in test/fixtures/key2.pem -out test/fixtures/key2.pub.pem -outform PEM -pubout
+openssl rsa -in test/fixtures/key3.pem -out test/fixtures/key3.pub.pem -outform PEM -pubout
+openssl rsa -in test/fixtures/key4.pem -out test/fixtures/key4.pub.pem -outform PEM -pubout

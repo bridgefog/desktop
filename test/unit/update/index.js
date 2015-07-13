@@ -1,12 +1,25 @@
 import fs from 'fs'
-import ursa from 'ursa'
+import ursa from 'ursa-purejs'
 import { assert } from 'chai'
 import UpdateVerifier from '../../../lib/update'
 
-var keypair1 = createKeyPair()
-var keypair2 = createKeyPair()
-var keypair3 = createKeyPair()
-var keypair4 = createKeyPair()
+var keypair1 = {
+  privateKey: fs.readFileSync('test/fixtures/key1.pem'),
+  publicKey: fs.readFileSync('test/fixtures/key1.pub.pem'),
+}
+var keypair2 = {
+  privateKey: fs.readFileSync('test/fixtures/key2.pem'),
+  publicKey: fs.readFileSync('test/fixtures/key2.pub.pem'),
+}
+var keypair3 = {
+  privateKey: fs.readFileSync('test/fixtures/key3.pem'),
+  publicKey: fs.readFileSync('test/fixtures/key3.pub.pem'),
+}
+var keypair4 = {
+  privateKey: fs.readFileSync('test/fixtures/key4.pem'),
+  publicKey: fs.readFileSync('test/fixtures/key4.pub.pem'),
+}
+
 var publicKeys = [keypair1.publicKey, keypair2.publicKey, keypair3.publicKey]
 var timestamp = new Date().getTime()
 var currentUpdate
@@ -70,7 +83,7 @@ function createKeyPair() {
 }
 
 function signMessage(message, privateKey) {
-  var keypair = ursa.createPrivateKey(privateKey, '', 'base64')
+  var keypair = ursa.createPrivateKey(privateKey, undefined, 'base64')
 
   return keypair.hashAndSign('SHA256', message)
 }
