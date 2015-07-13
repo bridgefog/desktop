@@ -47,7 +47,7 @@
   "dependencies": {
     "acoustid": "bridgefog/node-acoustid",
     "alt": "^0.16.2",
-    "atm-ipfs-api": "0.0.5-alpha1",
+    "atm-ipfs-api": "bridgefog/ipfs-api",
     "babel-runtime": "^5.4.7",
     "bs58": "^2.0.1",
     "coverart": "0.0.1",
