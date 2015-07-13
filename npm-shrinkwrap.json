@@ -5026,6 +5026,23 @@
           "resolved": "https://registry.npmjs.org/os-tmpdir/-/os-tmpdir-1.0.1.tgz"
         }
       }
+    },
+    "ursa": {
+      "version": "0.8.5",
+      "from": "ursa@*",
+      "resolved": "https://registry.npmjs.org/ursa/-/ursa-0.8.5.tgz",
+      "dependencies": {
+        "bindings": {
+          "version": "1.2.1",
+          "from": "bindings@>=1.2.1 <2.0.0",
+          "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
+        },
+        "nan": {
+          "version": "1.8.4",
+          "from": "nan@>=1.7.0 <2.0.0",
+          "resolved": "https://registry.npmjs.org/nan/-/nan-1.8.4.tgz"
+        }
+      }
     }
   }
 }
