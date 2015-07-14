@@ -12,8 +12,7 @@ describe('Discovery/Swarm', () => {
 
   describe('#gotKey()', () => {
     it('calls this.onKey with the key', (done) => {
-      var calledwith
-      var swarm = new Swarm({})
+      var swarm = new Swarm()
       swarm.onKey = key => {
         assert.equal(key, 'QmYNmQKp6SuaVrpgWRsPTgCQCnpxUYGq76YEKBXuj2N4H6')
         done()

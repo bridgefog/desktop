@@ -5,6 +5,8 @@ import PubTree from '../../../lib/discovery/pub-tree'
 
 var ipfsClient = new IPFSClient(ipfsUtil.ipfsEndpoint())
 
+var release = { a: 1 }
+
 var examples = {
   complete: {
     tracks: [
@@ -19,8 +21,12 @@ var examples = {
       'QmNd92Ndyccns8vTvdK66H1PC4qRXzKz3ewAqAzLbooEpB',
       'Qmf8oritrZdWRqUR62aDCwJvKKpoNwVGnVgJP2kB671RdA',
     ],
+    release: release,
   }
 }
+
+
+
 
 describe('Discovery/PubTree', () => {
   describe('.fromIPFS', () => {
@@ -35,6 +41,8 @@ describe('Discovery/PubTree', () => {
         return PubTree.fromIPFS(examples.complete.key, ipfsClient).then(pubTree => {
           assert.instanceOf(pubTree, PubTree)
           assert.deepEqual(pubTree.tracks, examples.complete.tracks)
+          assert.deepEqual(pubTree.peers, examples.complete.peers)
+          assert.deepEqual(pubTree.release, release)
         })
       })
     })
