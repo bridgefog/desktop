@@ -1,12 +1,15 @@
 #!/bin/bash
 
-set -e
+set -e -x
 
-set -x
+source env.sh
+
 npm install
 npm prune
+
 electron-rebuild
 bin/install-test-fixtures
+
 set +x
 
 if ! which fpcalc 2> /dev/null; then
