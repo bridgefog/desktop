@@ -94,9 +94,8 @@
       }
     },
     "atm-ipfs-api": {
-      "version": "0.1.0-alpha1",
-      "from": "atm-ipfs-api@0.1.0-alpha1",
-      "resolved": "https://registry.npmjs.org/atm-ipfs-api/-/atm-ipfs-api-0.1.0-alpha1.tgz",
+      "version": "0.1.1-alpha1",
+      "from": "atm-ipfs-api@0.1.1-alpha1",
       "dependencies": {
         "concat-stream": {
           "version": "1.5.0",
