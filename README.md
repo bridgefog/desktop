@@ -4,25 +4,32 @@ This is an [Electron][]-based desktop app for AllTheMusic
 
 ## Development
 
+Running tests assume you're already running IPFS locally, on the default port.
+
+Get dependencies:
+```shell
+make init
+```
+
+To start the gulp bundle process, run:
 ```shell
 source env.sh
-make init
-# to start the gulp bundle process, run
+# set up ipfs_endpoint variable to point to already running IPFS daemon used for tests
+ipfs-select local
 gulp
-# in a separate shell, start electron
+```
+
+In a separate shell, start electron:
+```shell
 gulp electron
-# hack
 ```
 
 To avoid disowned and lost IPFS daemons, always kill the Electron app via Application Quit rather than `^C` to `gulp electron`
 
-### ipfs-api
+### If work on atm-ipfs-api is needed
 
-The [ipfs-api][] package contains a large amount of the logic needed by this
-app. It's currently under very active development, so we recommend cloning and symlinking
-your local copy into this package, for the time being. We hope to firm up the
-API's soon so we can start merely referencing a semver-style version, but until
-then:
+It makes life easier to symlink your local `atm-ipfs-api` checkout to the `node_modules`
+in `desktop`
 
 1. Clone [ipfs-api][]
 2. In the `ipfs-api` directory
