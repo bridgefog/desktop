@@ -71,12 +71,12 @@ gulp.task('watch-static-bundle', ['static-bundle'], function () {
 })
 
 gulp.task('jscs', function () {
-  return gulp.src([].concat(globs.allJS))
+  return gulp.src([].concat(globs.allJS), { base: '.' })
     .pipe(jscs())
 })
 
 gulp.task('jshint', function () {
-  return gulp.src([].concat(globs.allJS, globs.allJSON))
+  return gulp.src([].concat(globs.allJS, globs.allJSON), { base: '.' })
     .pipe(gulpJshint({ linter: jsxhint }))
 })
 
