@@ -7,7 +7,7 @@ import { IPFSClient, util as ipfsUtils } from 'atm-ipfs-api'
 
 var exampleUpdates = {
   foo: {
-    key: 'QmRy3mWi78DU5tYYMz7fZnxpzK6DZ6BxTQeHYn9w8ZyHpa',
+    key: 'QmTAf6e33Mc2RvTq6op4vj13NhNv7feLxfSWgE5kGVS9vo',
     files: {
       'p/blah': 'bar\n',
       biz: 'baz\n',
