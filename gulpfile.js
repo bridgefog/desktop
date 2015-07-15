@@ -71,12 +71,12 @@ gulp.task('watch-static-bundle', ['static-bundle'], function () {
 })
 
 gulp.task('jscs', function () {
-  return gulp.src([].concat(globs.allJS))
+  return gulp.src([].concat(globs.allJS), { base: '.' })
     .pipe(jscs())
 })
 
 gulp.task('jshint', function () {
-  return gulp.src([].concat(globs.allJS, globs.allJSON))
+  return gulp.src([].concat(globs.allJS, globs.allJSON), { base: '.' })
     .pipe(gulpJshint({ linter: jsxhint }))
 })
 
@@ -88,7 +88,10 @@ gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
   console.log('Starting electron shell ', electron)
   var electronProc = proc.spawn(electron, ['--disable-http-cache', __dirname], {
     stdio: ['inherit', 'inherit', 'inherit'],
-    env: R.merge(process.env, { GULP: 'true' }),
+    env: R.merge(process.env, {
+      GULP: 'true',
+      NODE_DEBUG: 'ipfs-daemon,discovery,storage,discovery/swarm',
+    }),
   })
   electronProc.on('exit', done)
 })
