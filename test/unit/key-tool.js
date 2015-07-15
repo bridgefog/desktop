@@ -62,7 +62,7 @@ describe('KeyTool', () => {
     })
   })
 
-  describe('#signatureIsValidMultiKey', () => {
+  describe('#signatureIsCoreDev', () => {
     it('returns true if signed by core dev', () => {
       var message = 'Sign me'
       var signature = 'LdD8vF/A0lVpEkzTt+uTP7evZ9y8wEeFAlSxctOys/SDWRqa8f1ErFFZ9AgN9lnqBjJrnTIUM+tpr1zIeOLE/MOeeW+JEvBXF+fZQ0V1PsV1MW3XmCTIiOqkF5N9Ph/9LPW6do2rhtbHB43pCxx6L39DbXh+nNcH+Mv5telx5h/WhPKgAhiqc+gdwnLB16R6yKjbcgoTehc9j3P5g5xYxXNxzN6wLoo/3k5vGaiY0BYr7sdrPJXDaY4jUs3ECNIdM9x2nZylum1aUMxXxW+knRr+W683tkES2QHrOkotVMe5UhufEWhr6MFy6sUecJg2SQzCpfoFDHVirXjuA84hAw=='
