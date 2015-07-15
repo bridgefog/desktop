@@ -69,5 +69,13 @@ describe('KeyTool', () => {
 
       assert.equal(keyTool.signatureIsCoreDev(message, signature), true)
     })
+
+    it('returns false if not signed by core dev', () => {
+      var message = 'Sign me'
+      var keypair = ursa.createPrivateKey(keypair1.privateKey, undefined, 'base64')
+      var signature = keypair.hashAndSign('SHA256', message)
+
+      assert.equal(keyTool.signatureIsCoreDev(message, signature), false)
+    })
   })
 })
