@@ -94,8 +94,8 @@
       }
     },
     "atm-ipfs-api": {
-      "version": "0.1.1-alpha1",
-      "from": "atm-ipfs-api@0.1.1-alpha1",
+      "version": "0.1.2-alpha1",
+      "from": "atm-ipfs-api@0.1.2-alpha1",
       "dependencies": {
         "concat-stream": {
           "version": "1.5.0",
