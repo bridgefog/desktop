@@ -25,9 +25,6 @@ var examples = {
   }
 }
 
-
-
-
 describe('Discovery/PubTree', () => {
   describe('.fromIPFS', () => {
     before(() => {
