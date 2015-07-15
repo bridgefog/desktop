@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { assert } from 'chai'
 import rmrf from 'rmrf'
-import downloadUpdate from '../../lib/update/download-update'
+import downloadUpdate from '../../../lib/update/download-update'
 import { IPFSClient, util as ipfsUtils } from 'atm-ipfs-api'
 
 var exampleUpdates = {
@@ -22,7 +22,7 @@ describe('downloadUpdate', () => {
     var ipfsClient = new IPFSClient(ipfsUtils.ipfsEndpoint())
     // clean tree before test
     var basePath = path.resolve('./tmp/app_updates')
-    rmrf(basePath)
+    rmrf('./tmp/app_updates')
 
     return downloadUpdate(ipfsClient, key, basePath).then((updatePath) => {
       assert.equal(path.basename(updatePath), key)
