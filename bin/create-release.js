@@ -6,11 +6,11 @@ import fs from 'fs'
 // QmS5GMMaDp4Lpr5ZKaYYH1134sGNR1NDj3r7EYhkqn4UZf
 
 var releaseKey = 'QmS5GMMaDp4Lpr5ZKaYYH1134sGNR1NDj3r7EYhkqn4UZf'
-var timestamp = new Date().getTime()
+var version = require('../package.json').version
 
 var releaseObject = {
   payload: {
-    timestamp: timestamp,
+    version,
     ipfsKey: releaseKey,
   },
 
