@@ -24,7 +24,7 @@ var keypair4 = {
 describe('KeyTool', () => {
   describe('#signatureIsValid', () => {
     it('verifies a valid signature from a buffer', () => {
-      var message = new Buffer("Sign me")
+      var message = new Buffer('Sign me')
       var publicKey = keypair1.publicKey
       var keypair = ursa.createPrivateKey(keypair1.privateKey, undefined, 'base64')
       var signature = keypair.hashAndSign('SHA256', message)
@@ -33,7 +33,7 @@ describe('KeyTool', () => {
     })
 
     it('verifies a valid signature from a string message', () => {
-      var message = "Sign me"
+      var message = 'Sign me'
       var publicKey = keypair1.publicKey
       var keypair = ursa.createPrivateKey(keypair1.privateKey, undefined, 'base64')
       var signature = keypair.hashAndSign('SHA256', message)
@@ -44,7 +44,7 @@ describe('KeyTool', () => {
 
   describe('#signatureIsValidMultiKey', () => {
     it('returns the publicKey that verifies the message/signature', () => {
-      var message = "Sign me"
+      var message = 'Sign me'
       var keypair = ursa.createPrivateKey(keypair2.privateKey, undefined, 'base64')
       var signature = keypair.hashAndSign('SHA256', message)
       var publicKeys = [keypair1.publicKey, keypair2.publicKey, keypair3.publicKey]
@@ -53,7 +53,7 @@ describe('KeyTool', () => {
     })
 
     it('returns false if no key verifies the message/signature', () => {
-      var message = "Sign me"
+      var message = 'Sign me'
       var keypair = ursa.createPrivateKey(keypair4.privateKey, undefined, 'base64')
       var signature = keypair.hashAndSign('SHA256', message)
       var publicKeys = [keypair1.publicKey, keypair2.publicKey, keypair3.publicKey]
@@ -64,8 +64,8 @@ describe('KeyTool', () => {
 
   describe('#signatureIsValidMultiKey', () => {
     it('returns true if signed by core dev', () => {
-      var message = "Sign me"
-      var signature = "LdD8vF/A0lVpEkzTt+uTP7evZ9y8wEeFAlSxctOys/SDWRqa8f1ErFFZ9AgN9lnqBjJrnTIUM+tpr1zIeOLE/MOeeW+JEvBXF+fZQ0V1PsV1MW3XmCTIiOqkF5N9Ph/9LPW6do2rhtbHB43pCxx6L39DbXh+nNcH+Mv5telx5h/WhPKgAhiqc+gdwnLB16R6yKjbcgoTehc9j3P5g5xYxXNxzN6wLoo/3k5vGaiY0BYr7sdrPJXDaY4jUs3ECNIdM9x2nZylum1aUMxXxW+knRr+W683tkES2QHrOkotVMe5UhufEWhr6MFy6sUecJg2SQzCpfoFDHVirXjuA84hAw=="
+      var message = 'Sign me'
+      var signature = 'LdD8vF/A0lVpEkzTt+uTP7evZ9y8wEeFAlSxctOys/SDWRqa8f1ErFFZ9AgN9lnqBjJrnTIUM+tpr1zIeOLE/MOeeW+JEvBXF+fZQ0V1PsV1MW3XmCTIiOqkF5N9Ph/9LPW6do2rhtbHB43pCxx6L39DbXh+nNcH+Mv5telx5h/WhPKgAhiqc+gdwnLB16R6yKjbcgoTehc9j3P5g5xYxXNxzN6wLoo/3k5vGaiY0BYr7sdrPJXDaY4jUs3ECNIdM9x2nZylum1aUMxXxW+knRr+W683tkES2QHrOkotVMe5UhufEWhr6MFy6sUecJg2SQzCpfoFDHVirXjuA84hAw=='
 
       assert.equal(keyTool.signatureIsCoreDev(message, signature), true)
     })

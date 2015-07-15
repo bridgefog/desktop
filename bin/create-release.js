@@ -11,10 +11,10 @@ var timestamp = new Date().getTime()
 var releaseObject = {
   payload: {
     timestamp: timestamp,
-    ipfsKey: releaseKey
+    ipfsKey: releaseKey,
   },
 
-  signatures: []
+  signatures: [],
 }
 
 fs.writeFileSync('release.json', JSON.stringify(releaseObject))
