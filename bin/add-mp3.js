@@ -1,7 +1,5 @@
 #!/usr/bin/env babel-node
 
-'use strict'
-
 import childProcess from 'child_process'
 import fs from 'fs'
 import { http, https } from 'follow-redirects'

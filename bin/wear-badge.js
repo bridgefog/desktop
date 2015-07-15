@@ -1,7 +1,5 @@
 #!/usr/bin/env babel-node
 
-'use strict'
-
 import { IPFSClient, util as ipfsUtil } from 'atm-ipfs-api'
 import Clubnet from '../lib/clubnet'
 import Badge from '../lib/badge'

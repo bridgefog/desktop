@@ -1,7 +1,5 @@
 #!/usr/bin/env iojs
 
-'use strict'
-
 var fpcalc = require('fpcalc')
 
 function fingerprintFile(filename) {

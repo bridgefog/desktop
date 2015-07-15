@@ -1,7 +1,5 @@
 #!/usr/bin/env babel-node
 
-'use strict'
-
 import MusicCollection from '../lib/upload/music-collection'
 import Contents from '../lib/contents'
 import glob from 'glob'

@@ -1,7 +1,5 @@
 #!/usr/bin/env iojs
 
-'use strict'
-
 var acoustId = require('acoustid')
 
 function lookup(filename) {
