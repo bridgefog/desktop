@@ -1,7 +1,7 @@
 import fs from 'fs'
 import ursa from 'ursa-purejs'
 import { assert } from 'chai'
-import UpdateVerifier from '../../../lib/update'
+import UpdateVerifier from '../../../lib/update/verifier'
 
 var keypair1 = {
   privateKey: fs.readFileSync('test/fixtures/key1.pem'),
@@ -26,7 +26,7 @@ var currentUpdate
 var newUpdate
 var updateVerifier
 
-describe('updateVerifier', () => {
+describe('UpdateVerifier', () => {
   beforeEach(() => {
     currentUpdate = createUpdate(timestamp)
     newUpdate = createUpdate(timestamp + 1000)
