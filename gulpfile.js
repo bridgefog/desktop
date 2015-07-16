@@ -7,6 +7,7 @@ var jscs = require('gulp-jscs')
 var jsxhint = require('jshint-jsx').JSXHINT
 var livereload = require('gulp-livereload')
 var newer = require('gulp-newer')
+var path = require('path')
 var plumber = require('gulp-plumber')
 var proc = require('child_process')
 var sourcemaps = require('gulp-sourcemaps')
@@ -86,7 +87,8 @@ gulp.task('livereload', function () {
 
 gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
   console.log('Starting electron shell ', electron)
-  var electronProc = proc.spawn(electron, ['--disable-http-cache', __dirname], {
+  var electronCtxPath = path.resolve(__dirname, 'electron-context', 'current')
+  var electronProc = proc.spawn(electron, ['--disable-http-cache', electronCtxPath], {
     stdio: ['inherit', 'inherit', 'inherit'],
     env: R.merge(process.env, {
       GULP: 'true',

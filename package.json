@@ -1,6 +1,6 @@
 {
   "name": "bridgefog-desktop",
-  "version": "1.0.0",
+  "version": "0.98.123",
   "description": "Desktop application for bridgefog",
   "main": "dist/main.js",
   "scripts": {},
