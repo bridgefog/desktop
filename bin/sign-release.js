@@ -31,7 +31,7 @@ var valid = keyTool.signatureIsValid(payloadString, publicKey, signature)
 if (valid) {
   console.log('Created signature, writing to release.json')
   release.signatures.push({ body: signature })
-  fs.writeFileSync(releasePath, JSON.stringify(release))
+  fs.writeFileSync(releasePath, JSON.stringify(release) + '\n')
 } else {
   console.log('Created signature, but unable to verify, not writing to release.json')
 }

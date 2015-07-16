@@ -17,4 +17,4 @@ var releaseObject = {
   signatures: [],
 }
 
-fs.writeFileSync('release.json', JSON.stringify(releaseObject))
+fs.writeFileSync('release.json', JSON.stringify(releaseObject) + '\n')
