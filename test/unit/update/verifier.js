@@ -1,7 +1,9 @@
 import fs from 'fs'
 import ursa from 'ursa-purejs'
+import { IPFSClient, util as ipfsUtils } from 'atm-ipfs-api'
 import { assert } from 'chai'
 import UpdateVerifier from '../../../lib/update/verifier'
+import keyTool from '../../../lib/key-tool'
 
 var keypair1 = {
   privateKey: fs.readFileSync('test/fixtures/key1.pem'),
@@ -25,6 +27,8 @@ var currentVersion
 var newUpdate
 var updateVerifier
 
+var ipfsClient = new IPFSClient(ipfsUtils.ipfsEndpoint())
+
 describe('UpdateVerifier', () => {
   beforeEach(() => {
     currentVersion = '1.0.0'
@@ -36,6 +40,17 @@ describe('UpdateVerifier', () => {
     describe('Verifies when it', () => {
       it('is a valid release object', () => {
         assert(updateVerifier.isSignedAndVerified())
+      })
+
+      it.only('is an actual valid release', () => {
+        var key = 'QmUm93kCYdJnKtMsL9c2iK7X7BgCZ8n3GCJrkkVsJ4ezM9'
+        return ipfsClient.objectGet(key).then(obj => {
+          currentVersion = '0.0.1'
+          newUpdate = JSON.parse(obj.data)
+          updateVerifier = new UpdateVerifier(currentVersion, newUpdate, keyTool.coreDevPublicKeys())
+          assert(updateVerifier._updateIsNew(), 'is not new')
+          assert(updateVerifier._twoOfThreeAreValid(), 'is not valid sig')
+        })
       })
     })
 
