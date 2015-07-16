@@ -1,6 +1,6 @@
-# ATM Desktop app
+# Desktop app
 
-This is an [Electron][]-based desktop app for AllTheMusic
+An [Electron][]-based P2P streaming music application
 
 ## Development
 
