@@ -21,16 +21,15 @@ var keypair4 = {
 }
 
 var publicKeys = [keypair1.publicKey, keypair2.publicKey, keypair3.publicKey]
-var timestamp = new Date().getTime()
-var currentUpdate
+var currentVersion
 var newUpdate
 var updateVerifier
 
 describe('UpdateVerifier', () => {
   beforeEach(() => {
-    currentUpdate = createUpdate(timestamp)
-    newUpdate = createUpdate(timestamp + 1000)
-    updateVerifier = new UpdateVerifier(currentUpdate, newUpdate, publicKeys)
+    currentVersion = '1.0.0'
+    newUpdate = createUpdate('1.0.1')
+    updateVerifier = new UpdateVerifier(currentVersion, newUpdate, publicKeys)
   })
 
   describe('#isSignedAndVerified', () => {
@@ -42,30 +41,30 @@ describe('UpdateVerifier', () => {
 
     describe('Does not verify when it', () => {
       it('is an old release', () => {
-        newUpdate = createUpdate(timestamp - 1000)
-        updateVerifier = new UpdateVerifier(currentUpdate, newUpdate, publicKeys)
+        newUpdate = createUpdate('0.9.23')
+        updateVerifier = new UpdateVerifier(currentVersion, newUpdate, publicKeys)
 
         assert.equal(updateVerifier.isSignedAndVerified(), false)
       })
 
       it('has two signatures are verified by the same publicKey', () => {
         newUpdate.signatures[1] = newUpdate.signatures[0]
-        updateVerifier = new UpdateVerifier(currentUpdate, newUpdate, publicKeys)
+        updateVerifier = new UpdateVerifier(currentVersion, newUpdate, publicKeys)
 
         assert.equal(updateVerifier.isSignedAndVerified(), false)
       })
 
       it('is verified by some other publicKey', () => {
         var message = JSON.stringify(newUpdate.payload)
-        newUpdate.signatures[1] = signMessage(message, keypair4.privateKey)
-        updateVerifier = new UpdateVerifier(currentUpdate, newUpdate, publicKeys)
+        newUpdate.signatures[1].body = signMessage(message, keypair4.privateKey)
+        updateVerifier = new UpdateVerifier(currentVersion, newUpdate, publicKeys)
 
         assert.equal(updateVerifier.isSignedAndVerified(), false)
       })
 
       it('signed by two valid signatures but changed message', () => {
         newUpdate.payload.ipfsKey = 'QmSomeNewIPFSKeyThatAintRight'
-        var updateVerifier = new UpdateVerifier(currentUpdate, newUpdate, publicKeys)
+        var updateVerifier = new UpdateVerifier(currentVersion, newUpdate, publicKeys)
 
         assert.equal(updateVerifier.isSignedAndVerified(), false)
       })
@@ -88,9 +87,9 @@ function signMessage(message, privateKey) {
   return keypair.hashAndSign('SHA256', message)
 }
 
-function createUpdate(timestamp, signature1, signature2) {
+function createUpdate(version, signature1, signature2) {
   var payload = {
-    timestamp: timestamp,
+    version: version,
     ipfsKey: 'QmRgutAxd8t7oGkSm4wmeuByG6M51wcTso6cubDdQtuEfL',
   }
 
@@ -104,8 +103,8 @@ function createUpdate(timestamp, signature1, signature2) {
     payload: payload,
 
     signatures: [
-      signature1,
-      signature2,
+      { body: signature1 },
+      { body: signature2 },
     ],
   }
 }
