@@ -86,9 +86,10 @@ gulp.task('livereload', function () {
 })
 
 gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
-  console.log('Starting electron shell ', electron)
   var electronCtxPath = path.resolve(__dirname, 'electron-context', 'current')
-  var electronProc = proc.spawn(electron, ['--disable-http-cache', electronCtxPath], {
+  var electronBinPath = process.env.ELECTRON_PATH || electron
+  console.log('Starting electron shell ', electronBinPath)
+  var electronProc = proc.spawn(electronBinPath, ['--disable-http-cache', electronCtxPath], {
     stdio: ['inherit', 'inherit', 'inherit'],
     env: R.merge(process.env, {
       GULP: 'true',

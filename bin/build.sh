@@ -26,6 +26,8 @@ get_ipfs() {
 }
 
 copy_dot_app() {
+  echo 'this script is broken for now...'
+  exit 1
   rm -rf pkg/app/BridgeFog.app
   mkdir -p pkg/app
   cp -a node_modules/electron-prebuilt/dist/Electron.app pkg/app/BridgeFog.app
