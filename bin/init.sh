@@ -7,7 +7,7 @@ source env.sh
 npm install
 npm prune
 
-electron-rebuild
+electron-rebuild -f
 bin/install-test-fixtures
 
 set +x

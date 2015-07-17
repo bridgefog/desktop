@@ -9,12 +9,17 @@ var livereload = require('gulp-livereload')
 var newer = require('gulp-newer')
 var path = require('path')
 var plumber = require('gulp-plumber')
+var gulpUtil = require('gulp-util')
 var proc = require('child_process')
 var sourcemaps = require('gulp-sourcemaps')
 var mocha = require('gulp-mocha')
 var R = require('ramda')
 require('babel/register')
 var mochaReporter = require('./test/support/gulp-mocha-reporter')
+
+var electronCtxPath = path.resolve(__dirname, 'electron-context', 'current')
+var electronBinPath = process.env.ELECTRON_PATH || electron
+var electronVersion = require('./package.json').devDependencies['electron-prebuilt']
 
 var globs = {
   javascripts: ['./lib/**/*.js'],
@@ -86,8 +91,6 @@ gulp.task('livereload', function () {
 })
 
 gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
-  var electronCtxPath = path.resolve(__dirname, 'electron-context', 'current')
-  var electronBinPath = process.env.ELECTRON_PATH || electron
   console.log('Starting electron shell ', electronBinPath)
   var electronProc = proc.spawn(electronBinPath, ['--disable-http-cache', electronCtxPath], {
     stdio: ['inherit', 'inherit', 'inherit'],
@@ -150,3 +153,42 @@ gulp.task('watch-integration-tests', function () {
 })
 
 gulp.task('dist', ['js-bundle', 'static-bundle'])
+
+gulp.task('build', ['dist'], function () {
+  var packager = require('electron-packager')
+  var opts = {
+    dir: electronCtxPath,
+    name: 'BridgeFog',
+    platform: 'darwin',
+    arch: 'x64',
+    version: electronVersion,
+    out: path.resolve(__dirname, './pkg'),
+    icon: path.resolve(__dirname, './static/music-512.icns'),
+    'app-bundle-id': 'com.bridgefog.beam',
+    'helper-bundle-id': 'com.bridgefog.helper',
+    'app-version': require('./package.json').version,
+    prune: true,
+    protocols: [
+      { name: 'com.bridgefog.beam.url', schemes: ['bridgefog'] },
+    ],
+    // 'version-string': { // windows-only
+    //   CompanyName: '',
+    //   LegalCopyright: '',
+    //   FileDescription: '',
+    //   OriginalFilename: '',
+    //   FileVersion: '',
+    //   ProductVersion: '',
+    //   ProductName: '',
+    //   InternalName: '',
+    // }
+  }
+  packager(opts, function (err, appPaths) {
+    if (err) {
+      console.error('BUILD ERROR:', err.stack)
+      return
+    }
+
+    console.log('BUILD COMPLETE:', appPaths)
+  })
+
+})
