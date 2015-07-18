@@ -154,7 +154,7 @@ gulp.task('watch-integration-tests', function () {
 
 gulp.task('dist', ['js-bundle', 'static-bundle'])
 
-gulp.task('build', ['dist'], function () {
+gulp.task('build', ['dist'], function (done) {
   var packager = require('electron-packager')
   var opts = {
     dir: electronCtxPath,
@@ -162,6 +162,7 @@ gulp.task('build', ['dist'], function () {
     platform: 'darwin',
     arch: 'x64',
     version: electronVersion,
+    overwrite: true,
     out: path.resolve(__dirname, './pkg'),
     icon: path.resolve(__dirname, './static/music-512.icns'),
     'app-bundle-id': 'com.bridgefog.fog',
@@ -183,12 +184,10 @@ gulp.task('build', ['dist'], function () {
     // }
   }
   packager(opts, function (err, appPaths) {
-    if (err) {
-      console.error('BUILD ERROR:', err.stack)
-      return
+    if (!err) {
+      console.log('BUILD COMPLETE:', appPaths)
     }
-
-    console.log('BUILD COMPLETE:', appPaths)
+    done(err)
   })
 
 })
