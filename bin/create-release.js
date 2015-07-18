@@ -2,19 +2,33 @@
 
 import fs from 'fs'
 
-// ipfs add -r pkg/app/BridgeFog.app/Contents/Resources/app
-// QmS5GMMaDp4Lpr5ZKaYYH1134sGNR1NDj3r7EYhkqn4UZf
+import { IPFSClient, util as ipfsUtils } from 'atm-ipfs-api'
+import { Directory } from '../lib/ipfs-tree'
 
-var releaseKey = 'QmS5GMMaDp4Lpr5ZKaYYH1134sGNR1NDj3r7EYhkqn4UZf'
 var version = require('../package.json').version
 
-var releaseObject = {
-  payload: {
-    version,
-    ipfsKey: releaseKey,
-  },
+var ipfsClient = new IPFSClient(ipfsUtils.ipfsEndpoint())
 
-  signatures: [],
-}
+// ipfs add -q -r pkg/Fog-darwin-x64/Fog.app/Contents/Resources/app/ | tail -n 1
+// supply key as argument
+var appDirKey = process.argv[2]
 
-fs.writeFileSync('release.json', JSON.stringify(releaseObject) + '\n')
+var releaseDir = new Directory({
+  'Darwin-x64': appDirKey,
+})
+releaseDir.addToIPFS(ipfsClient).then(releaseKey => {
+  var releaseObject = {
+    payload: {
+      version,
+      ipfsKey: releaseKey,
+    },
+
+    signatures: [],
+  }
+
+  fs.writeFileSync('release.json', JSON.stringify(releaseObject) + '\n')
+  console.log(releaseObject)
+})
+.catch(err => {
+  console.error('ERROR', err.stack)
+})
