@@ -1,3 +1,4 @@
+var del = require('del')
 var electron = require('electron-prebuilt')
 var gulp = require('gulp')
 var gulpBabel = require('gulp-babel')
@@ -18,7 +19,7 @@ var mochaReporter = require('./test/support/gulp-mocha-reporter')
 
 var packageJSON = require('./package.json')
 
-var electronCtxPath = path.resolve(__dirname, 'electron-context')
+var electronCtxPath = path.resolve(__dirname, 'dist')
 var electronBinPath = process.env.ELECTRON_PATH || electron
 var electronVersion = packageJSON.devDependencies['electron-prebuilt']
 
@@ -32,9 +33,11 @@ var globs = {
   integration_tests: ['test/integration/**/*.js'],
   test_support: ['test/support/**/*.js'],
   dest: ['./dist'],
+  distCompiled: ['./dist/{lib,static,resources}'],
   bin: ['./bin/*.js'],
   publicKeys: ['./lib/**/*.pub'],
 }
+
 globs.allJS = [].concat(
   globs.javascripts,
   globs.bin,
@@ -49,7 +52,7 @@ globs.allJSON = [].concat(
 )
 
 gulp.task('js-bundle', function () {
-  return gulp.src(globs.javascripts)
+  return gulp.src(globs.javascripts, { base: '.' })
     .pipe(plumber(function (err) { console.log('[js-bundle ERROR]', err.stack) }))
     .pipe(newer(globs.dest[0]))
     .pipe(sourcemaps.init())
@@ -68,7 +71,7 @@ gulp.task('watch-js-bundle', function () {
 })
 
 gulp.task('static-bundle', function () {
-  return gulp.src([].concat(globs.static, globs.publicKeys))
+  return gulp.src([].concat(globs.static, globs.publicKeys), { base: '.' })
     .pipe(newer(globs.dest[0]))
     .pipe(gulp.dest(globs.dest[0]))
     .pipe(livereload())
@@ -104,16 +107,14 @@ gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
   electronProc.on('exit', done)
 })
 
-var defaultPrereqs = [
+gulp.task('default', [
   'livereload',
   'watch-lint',
   'watch-js-bundle',
   'watch-static-bundle',
   'watch-unit-tests',
   'test',
-]
-
-gulp.task('default', defaultPrereqs)
+])
 
 gulp.task('lint', ['jscs', 'jshint'])
 
@@ -154,7 +155,19 @@ gulp.task('watch-integration-tests', function () {
   gulp.watch([].concat(globs.javascripts, globs.integration_tests, globs.test_support), ['integration-tests'])
 })
 
-gulp.task('dist', ['js-bundle', 'static-bundle'])
+gulp.task('dist:clean', function (done) {
+  del(globs.distCompiled, done)
+})
+
+gulp.task('dist', ['dist:clean'], function (done) {
+  gulp.start('js-bundle', 'static-bundle', done)
+})
+
+gulp.task('build-linux-x64', ['dist'], buildRelease('linux', 'x64'))
+gulp.task('build-linux-ia32', ['dist'], buildRelease('linux', 'ia32'))
+gulp.task('build-linux', ['build-linux-x64', 'build-linux-ia32'])
+gulp.task('build-osx', ['dist'], buildRelease('darwin', 'x64'))
+gulp.task('build', ['build-osx', 'build-linux'])
 
 function buildRelease(os, arch) {
   return function () {
@@ -170,9 +183,3 @@ function buildRelease(os, arch) {
     })
   }
 }
-
-gulp.task('build-linux-x64', ['dist'], buildRelease('linux', 'x64'))
-gulp.task('build-linux-ia32', ['dist'], buildRelease('linux', 'ia32'))
-gulp.task('build-linux', ['build-linux-x64', 'build-linux-ia32'])
-gulp.task('build-osx', ['dist'], buildRelease('darwin', 'x64'))
-gulp.task('build', ['build-osx', 'build-linux'])
