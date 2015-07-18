@@ -1,7 +1,7 @@
 {
-  "name": "bridgefog-desktop",
+  "name": "com.bridgefog.fog",
   "version": "1.0.0",
-  "description": "Desktop application for bridgefog",
+  "description": "Fog music application",
   "main": "dist/main.js",
   "scripts": {},
   "private": true,

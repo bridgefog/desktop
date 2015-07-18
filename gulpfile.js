@@ -158,18 +158,18 @@ gulp.task('build', ['dist'], function () {
   var packager = require('electron-packager')
   var opts = {
     dir: electronCtxPath,
-    name: 'BridgeFog',
+    name: 'Fog',
     platform: 'darwin',
     arch: 'x64',
     version: electronVersion,
     out: path.resolve(__dirname, './pkg'),
     icon: path.resolve(__dirname, './static/music-512.icns'),
-    'app-bundle-id': 'com.bridgefog.beam',
-    'helper-bundle-id': 'com.bridgefog.helper',
+    'app-bundle-id': 'com.bridgefog.fog',
+    'helper-bundle-id': 'com.bridgefog.fog.helper',
     'app-version': require('./package.json').version,
     prune: true,
     protocols: [
-      { name: 'com.bridgefog.beam.url', schemes: ['bridgefog'] },
+      { name: 'com.bridgefog.fog.url', schemes: ['fog'] },
     ],
     // 'version-string': { // windows-only
     //   CompanyName: '',
