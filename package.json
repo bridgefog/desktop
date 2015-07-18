@@ -1,6 +1,6 @@
 {
   "name": "com.bridgefog.fog",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fog music application",
   "main": "dist/boot.js",
   "scripts": {},
