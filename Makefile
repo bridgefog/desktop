@@ -10,4 +10,5 @@ init:
 
 build: init
 	rm -rf dist
+	./bin/prepare-build-tools.sh
 	gulp build

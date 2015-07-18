@@ -37,6 +37,10 @@ in `desktop`
     2. run `npm link` [(see more about npm-link here)][npm-link]
 3. In this directory, run `npm link atm-ipfs-api`
 
+## Distribution Builds
+
+It's a failry manual process right now, but basically `make build` will get you a package for at least OSX, with more planned.
+
 [electron]: https://github.com/atom/electron
 [ipfs-api]: https://github.com/bridgefog/ipfs-api
 [npm-link]: https://docs.npmjs.com/cli/link
