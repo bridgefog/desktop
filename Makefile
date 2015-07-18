@@ -9,4 +9,5 @@ init:
 	./bin/init.sh
 
 build: init
-	./bin/build.sh
+	rm -rf dist
+	gulp build
