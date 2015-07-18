@@ -15,7 +15,6 @@ var sourcemaps = require('gulp-sourcemaps')
 var mocha = require('gulp-mocha')
 var R = require('ramda')
 require('babel/register')
-var mochaReporter = require('./test/support/gulp-mocha-reporter')
 
 var packageJSON = require('./package.json')
 
@@ -128,17 +127,12 @@ gulp.task('watch-lint', function () {
 
 gulp.task('unit-tests', function () {
   return gulp.src(globs.unit_tests, { read: false })
-    .pipe(mocha({ reporter: mochaReporter, }))
-})
-
-gulp.task('unit-tests-spec-reporter', function () {
-  return gulp.src(globs.unit_tests, { read: false })
-    .pipe(mocha({ reporter: 'spec', }))
+    .pipe(mocha({ reporter: testReporter(), }))
 })
 
 gulp.task('integration-tests', function () {
   return gulp.src(globs.integration_tests, { read: false })
-    .pipe(mocha({ reporter: mochaReporter, }))
+    .pipe(mocha({ reporter: testReporter(), }))
 })
 
 gulp.task('test', ['unit-tests', 'lint'])
@@ -148,6 +142,7 @@ gulp.task('watch-unit-tests', function () {
 })
 
 gulp.task('watch-unit-tests-spec-reporter', function () {
+  process.env.SPEC_REPORTER = '1'
   gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), ['unit-tests-spec-reporter'])
 })
 
@@ -168,6 +163,10 @@ gulp.task('build-linux-ia32', ['dist'], buildRelease('linux', 'ia32'))
 gulp.task('build-linux', ['build-linux-x64', 'build-linux-ia32'])
 gulp.task('build-osx', ['dist'], buildRelease('darwin', 'x64'))
 gulp.task('build', ['build-osx', 'build-linux'])
+
+function testReporter() {
+  return process.env.SPEC_REPORTER ? 'spec' : require('./test/support/gulp-mocha-reporter')
+}
 
 function buildRelease(os, arch) {
   return function () {
