@@ -2,7 +2,7 @@
   "name": "com.bridgefog.fog",
   "version": "1.0.0",
   "description": "Fog music application",
-  "main": "dist/main.js",
+  "main": "dist/boot.js",
   "scripts": {},
   "private": true,
   "license": "ISC",

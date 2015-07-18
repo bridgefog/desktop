@@ -96,7 +96,7 @@ gulp.task('electron', ['js-bundle', 'static-bundle'], function (done) {
     stdio: ['inherit', 'inherit', 'inherit'],
     env: R.merge(process.env, {
       GULP: 'true',
-      NODE_DEBUG: 'ipfs-daemon,discovery,storage,discovery/swarm',
+      NODE_DEBUG: 'boot,ipfs-daemon,discovery,storage,discovery/swarm',
     }),
   })
   electronProc.on('exit', done)
