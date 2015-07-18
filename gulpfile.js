@@ -9,7 +9,6 @@ var livereload = require('gulp-livereload')
 var newer = require('gulp-newer')
 var path = require('path')
 var plumber = require('gulp-plumber')
-var gulpUtil = require('gulp-util')
 var proc = require('child_process')
 var sourcemaps = require('gulp-sourcemaps')
 var mocha = require('gulp-mocha')
@@ -17,9 +16,11 @@ var R = require('ramda')
 require('babel/register')
 var mochaReporter = require('./test/support/gulp-mocha-reporter')
 
+var packageJSON = require('./package.json')
+
 var electronCtxPath = path.resolve(__dirname, 'electron-context')
 var electronBinPath = process.env.ELECTRON_PATH || electron
-var electronVersion = require('./package.json').devDependencies['electron-prebuilt']
+var electronVersion = packageJSON.devDependencies['electron-prebuilt']
 
 var globs = {
   javascripts: ['./lib/**/*.js'],
@@ -155,40 +156,23 @@ gulp.task('watch-integration-tests', function () {
 
 gulp.task('dist', ['js-bundle', 'static-bundle'])
 
-gulp.task('build', ['dist'], function (done) {
-  var packager = require('electron-packager')
-  var opts = {
-    dir: electronCtxPath,
-    name: 'Fog',
-    platform: 'darwin',
-    arch: 'x64',
-    version: electronVersion,
-    overwrite: true,
-    out: path.resolve(__dirname, './pkg'),
-    icon: path.resolve(__dirname, './static/music-512.icns'),
-    'app-bundle-id': 'com.bridgefog.fog',
-    'helper-bundle-id': 'com.bridgefog.fog.helper',
-    'app-version': require('./package.json').version,
-    prune: true,
-    protocols: [
-      { name: 'com.bridgefog.fog.url', schemes: ['fog'] },
-    ],
-    // 'version-string': { // windows-only
-    //   CompanyName: '',
-    //   LegalCopyright: '',
-    //   FileDescription: '',
-    //   OriginalFilename: '',
-    //   FileVersion: '',
-    //   ProductVersion: '',
-    //   ProductName: '',
-    //   InternalName: '',
-    // }
+function buildRelease(os, arch) {
+  return function () {
+    var packager = require('./utils/release-package')
+    return packager({
+      os,
+      arch,
+      electronVersion,
+      name: packageJSON.name,
+      version: packageJSON.version,
+      outputDir: path.resolve(__dirname, './pkg'),
+      inputDir: electronCtxPath,
+    })
   }
-  packager(opts, function (err, appPaths) {
-    if (!err) {
-      console.log('BUILD COMPLETE:', appPaths)
-    }
-    done(err)
-  })
+}
 
-})
+gulp.task('build-linux-x64', ['dist'], buildRelease('linux', 'x64'))
+gulp.task('build-linux-ia32', ['dist'], buildRelease('linux', 'ia32'))
+gulp.task('build-linux', ['build-linux-x64', 'build-linux-ia32'])
+gulp.task('build-osx', ['dist'], buildRelease('darwin', 'x64'))
+gulp.task('build', ['build-osx', 'build-linux'])
