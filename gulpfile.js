@@ -32,7 +32,7 @@ var globs = {
   test_support: ['test/support/**/*.js'],
   dest: ['./dist'],
   bin: ['./bin/*.js'],
-  publicKeys: ['./lib/core-dev/*.pub'],
+  publicKeys: ['./lib/**/*.pub'],
 }
 globs.allJS = [].concat(
   globs.javascripts,
