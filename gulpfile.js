@@ -17,7 +17,7 @@ var R = require('ramda')
 require('babel/register')
 var mochaReporter = require('./test/support/gulp-mocha-reporter')
 
-var electronCtxPath = path.resolve(__dirname, 'electron-context', 'current')
+var electronCtxPath = path.resolve(__dirname, 'electron-context')
 var electronBinPath = process.env.ELECTRON_PATH || electron
 var electronVersion = require('./package.json').devDependencies['electron-prebuilt']
 
