@@ -35,7 +35,7 @@ var globs = {
   dest: ['./dist'],
   distCompiled: ['./dist/{lib,static,resources}'],
   bin: ['./bin/*.js'],
-  publicKeys: ['./lib/**/*.pub'],
+  resources: ['./resources/**/*'],
 }
 
 globs.allJS = [].concat(
@@ -71,7 +71,7 @@ gulp.task('watch-js-bundle', function () {
 })
 
 gulp.task('static-bundle', function () {
-  return gulp.src([].concat(globs.static, globs.publicKeys), { base: '.' })
+  return gulp.src([].concat(globs.static, globs.resources), { base: '.' })
     .pipe(newer(globs.dest[0]))
     .pipe(gulp.dest(globs.dest[0]))
     .pipe(livereload())
