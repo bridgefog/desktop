@@ -4,7 +4,14 @@ import fs from 'fs'
 import { IPFSClient, util as ipfsUtil } from 'atm-ipfs-api'
 import PubTree from '../lib/discovery/pub-tree'
 import Peer from '../lib/discovery/peer'
+import Clubnet from '../lib/clubnet'
+import Badge from '../lib/badge'
+
 var ipfsClient = new IPFSClient(ipfsUtil.ipfsEndpoint())
+var clubnet = new Clubnet(ipfsClient, () => new Badge())
+
+clubnet.wearBadge()
+  .then(key => console.log('Wearing badge:', key.name))
 
 ipfsClient.peerID().then(myID => {
   var myPeer = new Peer(myID)
