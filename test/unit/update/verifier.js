@@ -3,7 +3,7 @@ import ursa from 'ursa-purejs'
 import { IPFSClient, util as ipfsUtils } from 'atm-ipfs-api'
 import { assert } from 'chai'
 import UpdateVerifier from '../../../lib/update/verifier'
-import keyTool from '../../../lib/key-tool'
+import { default as keyTool, coreDevPublicKeys } from '../../../lib/key-tool'
 
 var keypair1 = {
   privateKey: fs.readFileSync('test/fixtures/key1.pem'),
@@ -47,7 +47,7 @@ describe('UpdateVerifier', () => {
         return ipfsClient.objectGet(key).then(obj => {
           currentVersion = '0.0.1'
           newUpdate = JSON.parse(obj.data)
-          updateVerifier = new UpdateVerifier(currentVersion, newUpdate, keyTool.coreDevPublicKeys())
+          updateVerifier = new UpdateVerifier(currentVersion, newUpdate, coreDevPublicKeys)
           assert(updateVerifier._updateIsNew(), 'is not new')
           assert(updateVerifier._twoOfThreeAreValid(), 'is not valid sig')
         })

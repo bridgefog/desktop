@@ -11,7 +11,7 @@ ipfsClient.peerID().then(myID => {
   console.log()
   return myPeer.resolve(ipfsClient).then(pubTreeKey => {
     return PubTree.fromIPFS(pubTreeKey, ipfsClient).then(pubTree => {
-      console.log('Tracks:\n', pubTree.tracks, '\n')
+      console.log('Track count:\n', pubTree.tracks.length, '\n')
       console.log('Peers:\n', pubTree.peers, '\n')
       console.log('Release:\n', pubTree.release, '\n')
     })
