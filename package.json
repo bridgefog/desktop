@@ -52,6 +52,7 @@
     "babel-runtime": "^5.4.7",
     "bs58": "^2.0.1",
     "coverart": "0.0.1",
+    "electron-window": "^0.5.0",
     "follow-redirects": "0.0.3",
     "fpcalc": "^1.1.1",
     "glob": "^5.0.12",
