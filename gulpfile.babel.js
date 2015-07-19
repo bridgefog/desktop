@@ -1,3 +1,7 @@
+import fs from 'fs'
+import path from 'path'
+import proc from 'child_process'
+
 import R from 'ramda'
 import del from 'del'
 import electron from 'electron-prebuilt'
@@ -10,9 +14,7 @@ import jsxhint from 'jshint-jsx'
 import livereload from 'gulp-livereload'
 import mocha from 'gulp-mocha'
 import newer from 'gulp-newer'
-import path from 'path'
 import plumber from 'gulp-plumber'
-import proc from 'child_process'
 import sourcemaps from 'gulp-sourcemaps'
 
 import packageJSON from './package.json'
@@ -109,16 +111,19 @@ gulp.task('livereload', () => {
   return livereload.listen({ port: 35729 })
 })
 
-gulp.task('electron', ['js-bundle', 'static-bundle'], (done) => {
+gulp.task('electron', ['js-bundle', 'static-bundle'], () => {
   console.log('Starting electron shell ', electronBinPath)
+  var log = fs.openSync('./log/electron.log', 'a')
   var electronProc = proc.spawn(electronBinPath, ['--disable-http-cache', electronCtxPath], {
-    stdio: ['inherit', 'inherit', 'inherit'],
+    stdio: ['ignore', log, log],
+    detached: true,
     env: R.merge(process.env, {
       GULP: 'true',
       NODE_DEBUG: 'boot,ipfs-daemon,discovery,storage,discovery/swarm',
     }),
   })
-  electronProc.on('exit', done)
+  electronProc.unref()
+  console.log('Electron has been started. Watch log/electron.log for output')
 })
 
 gulp.task('lint', ['jscs', 'jshint'])
