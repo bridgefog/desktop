@@ -50,49 +50,56 @@ globs.allJSON = [].concat(
 
 gulp.task('default', [
   'livereload',
-  'watch-lint',
-  'watch-js-bundle',
-  'watch-static-bundle',
+  'watch',
   'watch-unit-tests',
-  'test',
 ])
 
-gulp.task('js-bundle', () => {
-  return gulp.src(globs.javascripts, { base: '.' })
-    .pipe(plumber(err => console.log('[js-bundle ERROR]', err.stack)))
+function jsBundle(cb) {
+  cb = R.once(cb)
+  let errorHandler = err => {
+    console.error(err.stack)
+    cb(err)
+  }
+  gulp.src(globs.javascripts, { base: '.' })
+    .pipe(plumber(errorHandler))
     .pipe(newer(globs.dest[0]))
     .pipe(sourcemaps.init())
     .pipe(gulpBabel())
     .pipe(gulpReact())
+    .pipe(plumber.stop())
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(globs.dest[0]))
     .pipe(livereload())
-})
+    .on('end', cb)
+}
+gulp.task('js-bundle', jsBundle)
+gulp.task('js-bundle:clean', ['dist:clean'], jsBundle)
 
-gulp.task('watch-js-bundle', () => {
-  // run once straight away; not a task dependency because we don't want the
-  // watch task dependent on success of initial `js-bundle` run
-  gulp.start('js-bundle')
-  return gulp.watch(globs.javascripts, ['js-bundle'])
-})
-
-gulp.task('static-bundle', () => {
+function staticBundle() {
   return gulp.src(globs.static, { base: '.' })
     .pipe(newer(globs.dest[0]))
     .pipe(gulp.dest(globs.dest[0]))
     .pipe(livereload())
+}
+gulp.task('static-bundle', staticBundle)
+gulp.task('static-bundle:clean', ['dist:clean'], staticBundle)
+
+gulp.task('watch', () => {
+  gulp.start('js-bundle')
+  gulp.start('static-bundle')
+  gulp.start('lint')
+
+  gulp.watch([].concat(globs.static, globs.allJS, globs.allJSON), () => {
+    gulp.start('static-bundle', 'js-bundle', 'lint')
+  })
 })
 
-gulp.task('watch-static-bundle', ['static-bundle'], () => {
-  return gulp.watch(globs.static, ['static-bundle'])
-})
-
-gulp.task('jscs', () => {
-  return gulp.src([].concat(globs.allJS), { base: '.' })
+gulp.task('jscs', ['js-bundle'], () => {
+  return gulp.src(globs.allJS, { base: '.' })
     .pipe(jscs())
 })
 
-gulp.task('jshint', () => {
+gulp.task('jshint', ['js-bundle'], () => {
   return gulp.src([].concat(globs.allJS, globs.allJSON), { base: '.' })
     .pipe(gulpJshint({ linter: jsxhint.JSXHINT }))
 })
@@ -115,20 +122,13 @@ gulp.task('electron', ['js-bundle', 'static-bundle'], (done) => {
 
 gulp.task('lint', ['jscs', 'jshint'])
 
-gulp.task('watch-lint', () => {
-  // run once straight away; not a task dependency because we don't want the
-  // watch task dependent on success of initial `lint` run
-  gulp.start('lint')
 
-  return gulp.watch([].concat(globs.allJS, globs.allJSON), ['lint'])
-})
-
-gulp.task('unit-tests', () => {
+gulp.task('unit-tests', ['js-bundle'], () => {
   return gulp.src(globs.unit_tests, { read: false })
     .pipe(mocha({ reporter: testReporter(), }))
 })
 
-gulp.task('integration-tests', () => {
+gulp.task('integration-tests', ['js-bundle'], () => {
   return gulp.src(globs.integration_tests, { read: false })
     .pipe(mocha({ reporter: testReporter(), }))
 })
@@ -136,7 +136,10 @@ gulp.task('integration-tests', () => {
 gulp.task('test', ['unit-tests', 'lint'])
 
 gulp.task('watch-unit-tests', () => {
-  gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), ['unit-tests'])
+  gulp.start('unit-tests')
+  gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), () => {
+    gulp.start('unit-tests')
+  })
 })
 
 gulp.task('watch-unit-tests-spec-reporter', (done) => {
@@ -145,16 +148,17 @@ gulp.task('watch-unit-tests-spec-reporter', (done) => {
 })
 
 gulp.task('watch-integration-tests', () => {
-  gulp.watch([].concat(globs.javascripts, globs.integration_tests, globs.test_support), ['integration-tests'])
+  gulp.start('integration-tests')
+  gulp.watch([].concat(globs.javascripts, globs.integration_tests, globs.test_support), () => {
+    gulp.start('integration-tests')
+  })
 })
 
 gulp.task('dist:clean', (done) => {
   del(globs.distCompiled, done)
 })
 
-gulp.task('dist', ['dist:clean'], (done) => {
-  gulp.start('js-bundle', 'static-bundle', done)
-})
+gulp.task('dist', ['dist:clean', 'js-bundle:clean', 'static-bundle:clean'])
 
 gulp.task('build-linux-x64', ['dist'], buildRelease('linux', 'x64'))
 gulp.task('build-linux-ia32', ['dist'], buildRelease('linux', 'ia32'))
@@ -168,8 +172,7 @@ function testReporter() {
 
 function buildRelease(os, arch) {
   return () => {
-    var packager = require('./utils/release-package')
-    return packager({
+    return require('./utils/release-package')({
       os,
       arch,
       electronVersion,
