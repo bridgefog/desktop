@@ -43,6 +43,7 @@ globs.allJS = [].concat(
   globs.integration_tests,
   globs.test_support
 )
+
 globs.allJSON = [].concat(
   globs.rc_files,
   globs.package_json
@@ -137,7 +138,7 @@ gulp.task('test', ['unit-tests', 'lint'])
 
 gulp.task('watch-unit-tests', () => {
   gulp.start('unit-tests')
-  gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support), () => {
+  gulp.watch([].concat(globs.javascripts, globs.unit_tests, globs.test_support, globs.static, globs.package_json), () => {
     gulp.start('unit-tests')
   })
 })
@@ -149,7 +150,7 @@ gulp.task('watch-unit-tests-spec-reporter', (done) => {
 
 gulp.task('watch-integration-tests', () => {
   gulp.start('integration-tests')
-  gulp.watch([].concat(globs.javascripts, globs.integration_tests, globs.test_support), () => {
+  gulp.watch([].concat(globs.javascripts, globs.integration_tests, globs.test_support, globs.static, globs.package_json), () => {
     gulp.start('integration-tests')
   })
 })
