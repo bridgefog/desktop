@@ -17,6 +17,7 @@
   "homepage": "https://github.com/bridgefog/desktop",
   "devDependencies": {
     "babel-core": "^5.4.7",
+    "bulk": "^2.0.0",
     "chai": "^3.0.0",
     "del": "^1.2.0",
     "dev-null": "^0.1.1",
@@ -40,6 +41,7 @@
     "jscs": "^1.11.3",
     "jshint-jsx": "^0.4.1",
     "jshint-stylish": "^1.0.1",
+    "linklocal": "^2.5.2",
     "mocha": "^2.2.1",
     "rmrf": "^1.0.2",
     "sinon": "^1.14.1",
