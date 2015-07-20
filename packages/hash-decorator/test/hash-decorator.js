@@ -1,4 +1,4 @@
-import { HashDecorator } from '../../lib/hash-decorator'
+import { HashDecorator } from 'hash-decorator'
 
 import { assert } from 'chai'
 
