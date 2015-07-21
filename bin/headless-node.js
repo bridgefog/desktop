@@ -6,7 +6,7 @@ import devNull from 'dev-null'
 import { IPFSClient, DagObject, util as ipfsUtil } from 'atm-ipfs-api'
 import Clubnet from '../lib/clubnet'
 import Badge from '../lib/badge'
-import decorateHash from '../lib/hash-decorator'
+import decorateHash from 'hash-decorator'
 
 var ipfs = new IPFSClient(ipfsUtil.ipfsEndpoint())
 var clubnet = new Clubnet(ipfs, () => new Badge())
