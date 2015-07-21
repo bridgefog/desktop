@@ -3,7 +3,9 @@
   "version": "1.0.1",
   "description": "Fog music application",
   "main": "lib/boot.js",
-  "scripts": {},
+  "scripts": {
+    "prepublish": "linklocal && linklocal list | bulk -c 'npm install'"
+  },
   "private": true,
   "license": "ISC",
   "repository": {
