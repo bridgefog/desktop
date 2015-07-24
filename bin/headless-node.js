@@ -1,169 +1,110 @@
 #!/usr/bin/env babel-node
 
-import { Set } from 'immutable'
+import { debuglog } from 'util'
+import path from 'path'
+
+import { IPFSClient, util as ipfsUtil } from 'atm-ipfs-api'
 import R from 'ramda'
-import devNull from 'dev-null'
-import { IPFSClient, DagObject, util as ipfsUtil } from 'atm-ipfs-api'
-import Clubnet from '../lib/clubnet'
-import Badge from '../lib/badge'
-import decorateHash from 'hash-decorator'
+import Queue from 'queue'
+import devnull from 'dev-null'
 
-var ipfs = new IPFSClient(ipfsUtil.ipfsEndpoint())
-var clubnet = new Clubnet(ipfs, () => new Badge())
+import DiscoveryService from '../lib/discovery'
 
-var fetchedKeys = new Set()
-var tracks = new Set()
-var myPeerID
+let log = debuglog('headless')
 
-const second = 1000
-const minute = 60 * second
+let releaseBasePath = path.resolve(__dirname, '../tmp/releases')
 
-function decoratePeerID(peerID) {
-  var dPeerID = decorateHash(peerID)
-  return '[' + (peerID === myPeerID ? `${dPeerID} (local node)` : dPeerID) + ']'
-}
+let ipfsClient = new IPFSClient(ipfsUtil.ipfsEndpoint())
 
-function publish(key) {
-  console.log('publishing:', key)
-  console.time('publish: ' + key)
-  return ipfs.namePublish(key)
-    .then(() => console.timeEnd('publish: ' + key))
-    .catch(handleError('publish'))
-}
+let discovery = new DiscoveryService({
+  ipfsClient,
+  releaseBasePath,
+})
 
-// function wearBadge() {
-//   return clubnet.wearBadge().then(key => {
-//     console.log('badge key =', key._hash)
-//     return key
-//   }).catch(handleError('wearBadge'))
-// }
+let totalFetched = 0
+let totalGivenUp = 0
 
-function handleError(scope) {
-  return function (err) {
-    if (!err) { return }
-    console.log('ERROR [%s]', scope)
-    if (err instanceof Error) {
-      console.log(err.stack)
-    } else {
-      console.log(err)
-    }
+function handleJobFailure(job, err) {
+  let label = err ? 'ERROR' : 'TIMEOUT'
+  if (job.retries > 0) {
+    log(`${label} for fetch of ${job.label}: ${job.ipfsPath}; retries left = ${job.retries}`, err)
+    job.retries -= 1
+    queue.push(job)
+  } else {
+    log(`${label} for fetch of ${job.label}: ${job.ipfsPath}; giving up!`, err)
+    totalGivenUp += 1
   }
 }
 
-function getPeers() {
-  return clubnet.findPeers().catch(handleError('getPeers'))
-}
+let queue
 
-var filesCompletedPrefetch = []
-var filesToPrefetch = []
+var printQueueStats = debounce(() => {
+  log('STATS:', { queue_length: queue.length, fetched: totalFetched, given_up: totalGivenUp })
+}, 500)
 
-function preFetchFiles() {
-  if (filesToPrefetch.length > 0) {
-    console.log('files to prefetch', filesToPrefetch.length)
-    var path = filesToPrefetch.pop()
-    var logPrefix = `[preFetchFile ${path}]`
-    return ipfs.cat(path)
+queue = new Queue({ concurrency: 3, timeout: 60000 })
+  .on('error', (err, job) => {
+    handleJobFailure(job, err)
+    printQueueStats()
+  })
+  .on('timeout', (next, job) => {
+    handleJobFailure(job)
+    printQueueStats()
+    next()
+  })
+  .on('success', (result, job) => {
+    log(`SUCCESS for fetch of ${job.label}: ${job.ipfsPath}`)
+    printQueueStats()
+    totalFetched += 1
+  })
+  .on('end', () => {
+    log('EMPTY')
+    printQueueStats()
+  })
+
+function createFetchJob(label, ipfsPath, retries = 5) {
+  let fn = cb => {
+    log(`START fetch for ${ipfsPath}`)
+    ipfsClient.cat(ipfsPath)
       .then(stream => {
-        return stream
-          .on('error', handleError(logPrefix + '[stream-error]'))
-          .on('end', () => console.log(logPrefix, 'success'))
-          .pipe(devNull())
+        stream.pipe(devnull())
+          .on('error', err => cb(err))
       })
-      .catch(handleError(logPrefix))
+      .then(() => cb())
+      .catch(cb)
+  }
+  fn.ipfsPath = ipfsPath
+  fn.label = label
+  fn.retries = retries
+  return fn
+}
+
+
+function enqueueLatestBatch() {
+  if (discovery.tracklist.latestBatch.isEmpty()) {
+    setTimeout(enqueueLatestBatch, 200)
+    return
+  }
+  discovery.tracklist.getAndFlushLatestBatch().forEach(track => {
+    let label = `${track.artist} - ${track.title}`
+    queue.push(createFetchJob(label, `/ipfs/${track.id}/file`))
+    queue.push(createFetchJob(label, `/ipfs/${track.id}/image`))
+    printQueueStats()
+  })
+  queue.start()
+  process.nextTick(enqueueLatestBatch)
+}
+
+function debounce(func, delay) {
+  let timeout
+  return () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      timeout = null
+      func()
+    }, delay)
   }
 }
 
-function preFetchFile(path) {
-  if (filesCompletedPrefetch.indexOf(path) < 0) {
-    filesToPrefetch.push(path)
-    filesCompletedPrefetch.push(path)
-  }
-}
-
-function fetchContent(thisPeersContents) {
-  var contents = new Set().union(R.pluck('Hash', thisPeersContents.Links))
-  contents = contents.subtract(fetchedKeys)
-
-  contents.forEach(id => {
-    ipfs.objectGet(id)
-      .then(object => {
-        fetchedKeys = fetchedKeys.add(id)
-        var metadata = JSON.parse(object.Data)
-        // metadata.id = id
-        // console.log('new track [%s]: %s - %s', id, metadata.artist, metadata.title)
-        tracks = tracks.add(id)
-
-        preFetchFile(id + '/file')
-        preFetchFile(id + '/image')
-      })
-      .catch(handleError('objectGet ' + id))
-  })
-}
-
-function addDirectoryTree(contents, peerlist) {
-  var addLink = (contentsNode, key) => contentsNode.addLink(key, key)
-  var contentsNode = R.reduce(addLink, new DagObject(), contents)
-  var peerlistNode = R.reduce(addLink, new DagObject(), peerlist)
-
-  return Promise.all([
-    ipfs.objectPut(contentsNode),
-    ipfs.objectPut(peerlistNode),
-  ])
-    .then(([contentsNodeHash, peerlistNodeHash]) => {
-      var obj = new DagObject()
-        .addLink('contents', contentsNodeHash)
-        .addLink('peers', peerlistNodeHash)
-      return ipfs.objectPut(obj)
-    })
-    .then(atmNodeHash =>
-          ipfs.objectPut(new DagObject().addLink('allthemusic', atmNodeHash)))
-}
-
-function publishLoop() {
-  console.log('Current stats: contents=%d tracks ; peerlist=%d peers', tracks.size, clubnet.peerlist.size)
-  return addDirectoryTree(tracks.toJS(), clubnet.peerlist.toJS())
-    .then(publish)
-    .catch(handleError('publishing'))
-    .then(() => setTimeout(publishLoop, 1 * minute))
-}
-
-function resolvePeer(peerID) {
-  return ipfs.nameResolve(peerID)
-    .then(resolvedKey => {
-      if (fetchedKeys.has(resolvedKey)) { return }
-
-      console.log('Peer', decoratePeerID(peerID), 'name resolved to new key', resolvedKey)
-
-      return ipfs.objectGet(resolvedKey + '/allthemusic/contents')
-        .catch(handleError('getting contents from peer\'s published key'))
-        .then(node => {
-          fetchedKeys = fetchedKeys.add(resolvedKey)
-          return node
-        })
-        .then(fetchContent)
-    })
-    .catch(handleError('looking up peer ' + peerID))
-}
-
-clubnet.on('newPeer', peerID => {
-  console.log('Found new peer:', decoratePeerID(peerID))
-  resolvePeer(peerID)
-  if (peerID == myPeerID) { return }
-  setInterval(resolvePeer, 1 * minute, peerID)
-})
-
-clubnet.on('peer', function (peerID) {
-  console.log('Found peer:', decoratePeerID(peerID))
-})
-
-ipfs.peerID()
-  .then(peerID => {
-    myPeerID = peerID
-    clubnet.addPeer(myPeerID)
-  })
-  .catch(handleError('getting local peer ID'))
-  .then(getPeers)
-  .then(publishLoop)
-
-setInterval(getPeers, 20 * second)
-setInterval(preFetchFiles, 1 * second)
+discovery.start()
+enqueueLatestBatch()
