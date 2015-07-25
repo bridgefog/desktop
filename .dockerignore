@@ -1,3 +1,7 @@
+.git
 tmp
 node_modules
-.git
+pkg
+dist/lib
+dist/static
+dist/resources

@@ -1,4 +1,4 @@
 #!/bin/bash
 
 [[ -z ${NODE_DEBUG} ]] && export NODE_DEBUG=discovery,discovery/swarm,headless
-exec bin/headless-node.js
+exec "$0.js"

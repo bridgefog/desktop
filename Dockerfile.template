@@ -10,7 +10,9 @@ WORKDIR /app
 
 COPY package.json /app/
 
-COPY packages/hash-decorator/package.json /app/packages/hash-decorator/
+{{#localpackages}}
+COPY {{& dir}}/package.json /app/{{& dir}}/
+{{/localpackages}}
 
 RUN npm install
 

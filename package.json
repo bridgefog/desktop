@@ -17,6 +17,11 @@
     "url": "https://github.com/bridgefog/desktop/issues"
   },
   "homepage": "https://github.com/bridgefog/desktop",
+  "optionalDependencies": {
+    "electron-packager": "^5.0.1",
+    "electron-prebuilt": "0.30.0",
+    "electron-rebuild": "^0.2.3"
+  },
   "devDependencies": {
     "babel": "^5.6.23",
     "babel-core": "^5.4.7",
@@ -24,9 +29,6 @@
     "chai": "^3.0.0",
     "del": "^1.2.0",
     "dev-null": "^0.1.1",
-    "electron-packager": "^5.0.1",
-    "electron-prebuilt": "0.30.0",
-    "electron-rebuild": "^0.2.3",
     "esprima-fb": "^15001.1.0-dev-harmony-fb",
     "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
@@ -46,6 +48,7 @@
     "jshint-stylish": "^1.0.1",
     "linklocal": "^2.5.2",
     "mocha": "^2.2.1",
+    "mustache": "^2.1.3",
     "rmrf": "^1.0.2",
     "sinon": "^1.14.1",
     "stream-array": "^1.1.0"

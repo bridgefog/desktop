@@ -4,15 +4,16 @@ import proc from 'child_process'
 
 import R from 'ramda'
 import del from 'del'
-import electron from 'electron-prebuilt'
 import gulp from 'gulp'
 import gulpBabel from 'gulp-babel'
 import gulpJshint from 'gulp-jshint'
 import gulpReact from 'gulp-react'
 import jscs from 'gulp-jscs'
 import jsxhint from 'jshint-jsx'
+import linklocal from 'linklocal'
 import livereload from 'gulp-livereload'
 import mocha from 'gulp-mocha'
+import mustache from 'mustache'
 import newer from 'gulp-newer'
 import plumber from 'gulp-plumber'
 import sourcemaps from 'gulp-sourcemaps'
@@ -20,8 +21,6 @@ import sourcemaps from 'gulp-sourcemaps'
 import packageJSON from './package.json'
 
 var electronCtxPath = path.resolve(__dirname, 'dist')
-var electronBinPath = process.env.ELECTRON_PATH || electron
-var electronVersion = packageJSON.devDependencies['electron-prebuilt']
 
 var globs = {
   bin: ['./bin/*.js'],
@@ -58,6 +57,7 @@ gulp.task('default', [
   'livereload',
   'watch',
   'watch-unit-tests',
+  'dockerfile',
 ])
 
 function jsBundle(cb) {
@@ -115,6 +115,8 @@ gulp.task('livereload', () => {
 })
 
 gulp.task('electron', ['js-bundle', 'static-bundle'], () => {
+  var electron = require('electron-prebuilt')
+  var electronBinPath = process.env.ELECTRON_PATH || electron
   console.log('Starting electron shell ', electronBinPath)
   var log = fs.openSync('./log/electron.log', 'a')
   var electronProc = proc.spawn(electronBinPath, ['--disable-http-cache', electronCtxPath], {
@@ -170,6 +172,22 @@ gulp.task('watch-integration-tests', () => {
   })
 })
 
+gulp.task('dockerfile', (done) => {
+  linklocal.list(__dirname, (err, localpackages) => {
+    if (err) { return done(err) }
+
+    localpackages = localpackages.map(item => {
+      return {
+        dir: path.relative(__dirname, item.to),
+      }
+    })
+
+    let template = fs.readFileSync(path.resolve(__dirname, 'Dockerfile.template'))
+    let dockerfile = mustache.render(template.toString(), { localpackages })
+    fs.writeFile(path.resolve(__dirname, 'Dockerfile'), dockerfile, done)
+  })
+})
+
 gulp.task('dist:clean', (done) => {
   del(globs.distCompiled, done)
 })
@@ -188,6 +206,7 @@ function testReporter() {
 
 function buildRelease(os, arch) {
   return () => {
+    var electronVersion = packageJSON.optionalDependencies['electron-prebuilt']
     return require('./utils/release-package')({
       os,
       arch,
