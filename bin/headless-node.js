@@ -42,7 +42,9 @@ var printQueueStats = debounce(() => {
   log('STATS:', { queue_length: queue.length, fetched: totalFetched, given_up: totalGivenUp })
 }, 500)
 
-queue = new Queue({ concurrency: 3, timeout: 60000 })
+var concurrency = process.env.CONCURRENCY || 3
+
+queue = new Queue({ concurrency: concurrency, timeout: 60000 })
   .on('error', (err, job) => {
     handleJobFailure(job, err)
     printQueueStats()
