@@ -10,7 +10,6 @@ import gulpJshint from 'gulp-jshint'
 import gulpReact from 'gulp-react'
 import jscs from 'gulp-jscs'
 import jsxhint from 'jshint-jsx'
-import linklocal from 'linklocal'
 import livereload from 'gulp-livereload'
 import mocha from 'gulp-mocha'
 import mustache from 'mustache'
@@ -57,7 +56,6 @@ gulp.task('default', [
   'livereload',
   'watch',
   'watch-unit-tests',
-  'dockerfile',
 ])
 
 function jsBundle(cb) {
@@ -169,22 +167,6 @@ gulp.task('watch-integration-tests', () => {
   gulp.start('integration-tests')
   gulp.watch([].concat(globs.javascripts, globs.integration_tests, globs.test_support, globs.static, globs.package_json), () => {
     gulp.start('integration-tests')
-  })
-})
-
-gulp.task('dockerfile', (done) => {
-  linklocal.list(__dirname, (err, localpackages) => {
-    if (err) { return done(err) }
-
-    localpackages = localpackages.map(item => {
-      return {
-        dir: path.relative(__dirname, item.to),
-      }
-    })
-
-    let template = fs.readFileSync(path.resolve(__dirname, 'Dockerfile.template'))
-    let dockerfile = mustache.render(template.toString(), { localpackages })
-    fs.writeFile(path.resolve(__dirname, 'Dockerfile'), dockerfile, done)
   })
 })
 

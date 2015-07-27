@@ -13,14 +13,11 @@ WORKDIR /app
 
 COPY package.json /app/
 
-COPY packages/hash-decorator/package.json /app/packages/hash-decorator/
-
 RUN npm install
 
 ENV PATH /app/bin:/app/node_modules/.bin:$PATH
 COPY ./ /app/
 
 RUN npm install
-RUN npm run prepublish
 
 ENTRYPOINT ["docker-wrapper"]
