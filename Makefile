@@ -10,4 +10,4 @@ init:
 
 build: init
 	./bin/prepare-build-tools.sh
-	gulp build
+	gulp build-osx

@@ -13,17 +13,17 @@ var ipfsClient = new IPFSClient(ipfsUtils.ipfsEndpoint())
 var targets = {
   darwin: {
     x64: {
-      ipfsReleaseID: 'QmUuKeMKEpkzJrPXCbWfwvfxhU6xpurHTj4rkp9wah1pfd',
+      ipfsReleaseID: 'QmZsXstfPAVvAvvsQjxKEhVMp8a7Gwe6P1pnu6KNccZWzE',
       ipfsVendorPath: './Fog.app/Contents/Resources/app/vendor/ipfs',
     },
   },
   linux: {
     x64: {
-      ipfsReleaseID: 'QmPEmE1CaZjNLoFrDrSic4cJUDG6i8bAX68pQJ1rCZkbBH',
+      ipfsReleaseID: '',
       ipfsVendorPath: './resources/app/vendor/ipfs',
     },
     ia32: {
-      ipfsReleaseID: 'QmXjimrPrnoA3ZUwM4Dn6b3Gdp7VTUNR55vCUU1iHxiR46',
+      ipfsReleaseID: '',
       ipfsVendorPath: './resources/app/vendor/ipfs',
     },
   },

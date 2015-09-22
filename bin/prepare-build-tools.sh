@@ -1,7 +1,7 @@
 #!/bin/bash
 
 get_ipfs() {
-  version=0.3.5
+  version=0.3.7
   os=$1
   arch=$2
   name="ipfs_v${version}_${os}-${arch}"
