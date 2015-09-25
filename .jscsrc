@@ -37,7 +37,6 @@
   "disallowTrailingWhitespace": true,
   "disallowYodaConditions": true,
   "esnext": true,
-  "esprima": "esprima-fb",
   "requireBlocksOnNewline": 2,
   "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
   "requireCapitalizedConstructors": true,
