@@ -2,6 +2,8 @@
 
 An [Electron][]-based P2P streaming music application
 
+![screenshot](http://bridgefog.github.io/assets/img/poccap.png)
+
 ## Development
 
 Running tests assume you're already running IPFS locally, on the default port.
